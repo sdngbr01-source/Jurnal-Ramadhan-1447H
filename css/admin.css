@@ -984,4 +984,479 @@ select.form-control {
         background: #f0f0f0;
         color: #000;
     }
+
+}
+
+/* ===== ADMIN PANEL MOBILE RESPONSIVE ===== */
+
+/* Smartphone Portrait */
+@media screen and (max-width: 480px) {
+    .admin-wrapper {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding-bottom: 10px;
+    }
+    
+    .sidebar-header {
+        display: none; /* Sembunyikan header di mobile */
+    }
+    
+    .sidebar-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 5px;
+    }
+    
+    .sidebar-nav li {
+        margin: 2px;
+    }
+    
+    .sidebar-nav a {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .sidebar-nav a span {
+        display: none; /* Sembunyikan teks, hanya icon */
+    }
+    
+    .sidebar-nav a i {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+    
+    .admin-main {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+        text-align: center;
+    }
+    
+    .admin-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .admin-info {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .admin-info button {
+        margin: 5px !important;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .admin-content {
+        padding: 15px;
+    }
+    
+    /* Stats Cards */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 12px;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .stat-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .stat-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .stat-info p {
+        font-size: 0.8rem;
+    }
+    
+    /* Charts */
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .chart-card {
+        padding: 15px;
+    }
+    
+    .chart-card h4 {
+        font-size: 1rem;
+    }
+    
+    canvas {
+        max-height: 200px !important;
+    }
+    
+    /* Detail Grid */
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .detail-item {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+    
+    /* Section Header */
+    .section-header {
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .section-header h3 {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+    
+    .header-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+    
+    .header-buttons button {
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    /* Filter Bar */
+    .filter-bar {
+        padding: 15px;
+    }
+    
+    .filter-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .filter-group .form-control {
+        width: 100%;
+    }
+    
+    /* Tables */
+    .table-responsive {
+        margin: 0 -15px;
+        width: calc(100% + 30px);
+    }
+    
+    .table {
+        font-size: 0.75rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 5px;
+        white-space: nowrap;
+    }
+    
+    .table-bordered {
+        min-width: 1200px; /* Tetap lebar untuk scrolling */
+    }
+    
+    .btn-edit,
+    .btn-delete {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+    }
+    
+    /* Export Grid */
+    .export-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .export-card {
+        padding: 20px 15px;
+    }
+    
+    .export-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .export-icon i {
+        font-size: 2rem;
+    }
+    
+    .export-card h4 {
+        font-size: 1.1rem;
+    }
+    
+    .export-card p {
+        font-size: 0.8rem;
+    }
+    
+    /* Modal */
+    .modal-content {
+        margin: 20px 15px;
+        width: auto;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        padding: 15px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .modal-actions button {
+        width: 100%;
+        padding: 12px;
+    }
+    
+    /* Upload Preview */
+    .upload-info {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    .upload-info ul {
+        margin-left: 20px;
+    }
+    
+    .preview-table {
+        max-height: 150px;
+        font-size: 0.8rem;
+    }
+    
+    .preview-table th,
+    .preview-table td {
+        padding: 4px;
+    }
+    
+    /* Alerts */
+    .alert {
+        padding: 12px;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+}
+
+/* Smartphone Landscape */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .sidebar-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .admin-main {
+        margin-left: 0;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .header-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .header-buttons button {
+        width: auto;
+        flex: 1;
+    }
+    
+    .filter-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group .form-control {
+        flex: 1 1 calc(50% - 5px);
+    }
+}
+
+/* Tablet */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 220px;
+    }
+    
+    .admin-main {
+        margin-left: 220px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .export-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Fix for very small devices */
+@media screen and (max-width: 320px) {
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .stat-icon {
+        margin-bottom: 10px;
+    }
+    
+    .btn-edit,
+    .btn-delete {
+        display: block;
+        width: 100%;
+        margin: 2px 0;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    .sidebar-nav a,
+    .btn-primary,
+    .btn-success,
+    .btn-secondary,
+    .btn-edit,
+    .btn-delete,
+    .stat-card,
+    .export-card {
+        -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+    }
+    
+    .sidebar-nav a:hover,
+    .btn-primary:hover,
+    .stat-card:hover,
+    .export-card:hover {
+        transform: none;
+    }
+    
+    /* Larger touch targets for mobile */
+    .btn-edit,
+    .btn-delete {
+        padding: 8px 12px;
+    }
+    
+    select.form-control {
+        background-size: 20px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .admin-main {
+        background: #1a1a1a;
+    }
+    
+    .admin-header {
+        background: #2d2d2d;
+        color: #f0f0f0;
+    }
+    
+    .admin-header h2 {
+        color: #ffd700;
+    }
+    
+    .admin-info {
+        background: #3d3d3d;
+        color: #f0f0f0;
+    }
+    
+    .stat-card,
+    .chart-card,
+    .stats-detail,
+    .filter-bar,
+    .export-card {
+        background: #2d2d2d;
+        color: #f0f0f0;
+    }
+    
+    .stat-info p,
+    .detail-item span {
+        color: #ccc;
+    }
+    
+    .table {
+        background: #2d2d2d;
+        color: #f0f0f0;
+    }
+    
+    .table td {
+        border-bottom-color: #404040;
+    }
+    
+    .table tbody tr:hover {
+        background: #3d3d3d;
+    }
+    
+    .form-control {
+        background: #3d3d3d;
+        border-color: #404040;
+        color: #f0f0f0;
+    }
+    
+    .form-control:focus {
+        border-color: #ffd700;
+    }
+    
+    .modal-content {
+        background: #2d2d2d;
+        color: #f0f0f0;
+    }
+    
+    .upload-info {
+        background: #3d3d3d;
+    }
+    
+    .preview-table {
+        background: #3d3d3d;
+    }
 }
