@@ -392,4 +392,303 @@ section {
     .doa-grid {
         grid-template-columns: 1fr;
     }
+
+}
+/* ===== MOBILE RESPONSIVE STYLES ===== */
+
+/* Smartphone Portrait (320px - 480px) */
+@media screen and (max-width: 480px) {
+    /* Header */
+    .header .container {
+        flex-direction: column;
+        padding: 10px;
+    }
+    
+    .logo h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+    
+    .logo p {
+        text-align: center;
+    }
+    
+    .smart-school {
+        margin: 10px 0;
+        display: inline-block;
+    }
+    
+    .nav-menu ul {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .nav-menu li {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .nav-menu a {
+        display: block;
+        padding: 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+    }
+    
+    .btn-login {
+        display: block;
+        text-align: center;
+    }
+    
+    /* Hero Section */
+    .hero {
+        padding: 50px 15px;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-content p {
+        font-size: 1rem;
+    }
+    
+    .btn-primary {
+        padding: 12px 25px;
+        font-size: 1rem;
+        width: 100%;
+        text-align: center;
+    }
+    
+    /* Section Titles */
+    .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    
+    /* Materi Cards */
+    .materi-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 0 10px;
+    }
+    
+    .materi-card {
+        padding: 15px;
+    }
+    
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 15px;
+    }
+    
+    .card-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .materi-card h3 {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+    
+    .materi-card ul {
+        padding-left: 20px;
+    }
+    
+    .materi-card li {
+        font-size: 0.9rem;
+    }
+    
+    /* Ayat Section */
+    .ayat-container {
+        grid-template-columns: 1fr;
+        padding: 0 10px;
+    }
+    
+    .ayat-card {
+        padding: 15px;
+    }
+    
+    .arabic {
+        font-size: 1.2rem;
+        line-height: 2rem;
+    }
+    
+    .latin {
+        font-size: 0.9rem;
+    }
+    
+    .arti {
+        font-size: 0.9rem;
+    }
+    
+    /* Doa Section */
+    .doa-grid {
+        grid-template-columns: 1fr;
+        padding: 0 10px;
+    }
+    
+    .doa-card {
+        padding: 15px;
+    }
+    
+    .doa-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    /* Tips Section */
+    .tips-list {
+        padding: 0 15px;
+    }
+    
+    .tip-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .tip-number {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        margin: 0 auto;
+    }
+    
+    .tip-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .tip-content p {
+        font-size: 0.9rem;
+    }
+    
+    /* Footer */
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 0 15px;
+    }
+    
+    .footer-info h3 {
+        font-size: 1.3rem;
+    }
+    
+    .footer-links ul {
+        padding: 0;
+    }
+    
+    .footer-contact p {
+        justify-content: center;
+    }
+    
+    .copyright {
+        font-size: 0.8rem;
+        padding: 15px;
+    }
+}
+
+/* Smartphone Landscape (481px - 768px) */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .header .container {
+        flex-wrap: wrap;
+    }
+    
+    .logo {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    
+    .nav-menu ul {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .materi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .doa-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .hero-content h2 {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+/* Tablet (769px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .materi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .doa-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .container {
+        padding: 0 30px;
+    }
+}
+
+/* Touch-friendly improvements for mobile */
+@media (hover: none) and (pointer: coarse) {
+    /* Larger touch targets */
+    .nav-menu a,
+    .btn-primary,
+    .btn-login,
+    .materi-card,
+    .tip-item {
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+    }
+    
+    /* Remove hover effects on mobile */
+    .materi-card:hover,
+    .btn-primary:hover {
+        transform: none;
+    }
+    
+    /* Better scrolling */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #1a1a1a;
+        color: #f0f0f0;
+    }
+    
+    .materi-card,
+    .ayat-card,
+    .doa-card {
+        background: #2d2d2d;
+        color: #f0f0f0;
+    }
+    
+    .materi-card h3,
+    .ayat-card h3,
+    .doa-card h3 {
+        color: #ffd700;
+    }
+    
+    .latin,
+    .arti {
+        color: #ccc;
+    }
+    
+    .footer {
+        background: #000;
+    }
 }
