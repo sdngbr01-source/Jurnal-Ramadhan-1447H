@@ -367,4 +367,204 @@
 
 ::-webkit-scrollbar-thumb:hover {
     background: #2a5298;
+
+}
+
+/* ===== DASHBOARD MOBILE RESPONSIVE ===== */
+
+/* Smartphone Portrait */
+@media screen and (max-width: 480px) {
+    .dashboard-nav .container {
+        flex-direction: column;
+        padding: 10px;
+    }
+    
+    .nav-brand {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .nav-brand h2 {
+        font-size: 1.3rem;
+    }
+    
+    .nav-brand p {
+        font-size: 0.8rem;
+    }
+    
+    .nav-menu {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+    
+    .date-picker {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .date-picker label {
+        width: 100%;
+        text-align: left;
+    }
+    
+    .date-picker input {
+        width: 100%;
+    }
+    
+    .btn-logout {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Card Header */
+    .card-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .card-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    /* Form Sections */
+    .card-body {
+        padding: 15px;
+    }
+    
+    .form-section {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .form-section h4 {
+        font-size: 1.1rem;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .radio-label {
+        width: 100%;
+        padding: 8px;
+        background: #f0f0f0;
+        border-radius: 5px;
+    }
+    
+    .shalat-item {
+        padding: 12px;
+    }
+    
+    .shalat-item h5 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+    
+    .form-control {
+        padding: 12px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    select.form-control {
+        font-size: 16px;
+    }
+    
+    /* Form Actions */
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        padding: 15px;
+        font-size: 1rem;
+    }
+    
+    /* Table */
+    .table {
+        font-size: 0.8rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 5px;
+    }
+    
+    .btn-edit,
+    .btn-delete {
+        padding: 5px 8px;
+        font-size: 0.8rem;
+    }
+    
+    /* Alert */
+    .alert {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Smartphone Landscape */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .dashboard-nav .container {
+        flex-wrap: wrap;
+    }
+    
+    .nav-brand {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    
+    .nav-menu {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .date-picker {
+        flex: 1;
+    }
+    
+    .date-picker input {
+        width: auto;
+    }
+    
+    .radio-group {
+        flex-wrap: wrap;
+    }
+}
+
+/* Fix for iOS input zoom */
+@media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Better touch scrolling */
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 15px;
+}
+
+/* Loading state for mobile */
+@media screen and (max-width: 480px) {
+    .loading-spinner {
+        padding: 30px 15px;
+    }
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+    }
 }
