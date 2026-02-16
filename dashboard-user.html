@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard User - Jurnal Ramadhan</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="dashboard-nav">
+        <div class="container">
+            <div class="nav-brand">
+                <h2>Jurnal Ramadhan</h2>
+                <p>Selamat datang, <span id="userNameDisplay"></span></p>
+            </div>
+            <div class="nav-menu">
+                <div class="date-picker">
+                    <label for="tanggal">Tanggal:</label>
+                    <input type="date" id="tanggal" class="form-control" max="2025-03-31">
+                </div>
+                <button onclick="logout()" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-pen-alt"></i> Jurnal Harian Ramadhan</h3>
+                            <div class="alert alert-info" id="dateInfo"></div>
+                        </div>
+                        <div class="card-body">
+                            <form id="jurnalForm">
+                                <!-- Puasa -->
+                                <div class="form-section">
+                                    <h4>1. Puasa Ramadhan</h4>
+                                    <div class="form-group">
+                                        <label>Apakah Anda puasa hari ini?</label>
+                                        <div class="radio-group">
+                                            <label class="radio-label">
+                                                <input type="radio" name="puasa" value="ya" required> Ya
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="puasa" value="tidak"> Tidak
+                                            </label>
+                                        </div>
+                                        <div class="alasan-field" id="alasanPuasaField" style="display: none;">
+                                            <label>Alasan tidak puasa:</label>
+                                            <textarea name="alasanPuasa" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sholat Wajib -->
+                                <div class="form-section">
+                                    <h4>2. Sholat Wajib</h4>
+                                    
+                                    <!-- Subuh -->
+                                    <div class="shalat-item">
+                                        <h5>Subuh</h5>
+                                        <div class="form-group">
+                                            <label>Apakah sholat Subuh?</label>
+                                            <div class="radio-group">
+                                                <label><input type="radio" name="subuh_status" value="ya" class="shalat-status" data-shalat="subuh"> Ya</label>
+                                                <label><input type="radio" name="subuh_status" value="tidak" class="shalat-status" data-shalat="subuh"> Tidak</label>
+                                            </div>
+                                            <div class="shalat-detail" id="subuhDetail" style="display: none;">
+                                                <div class="form-group">
+                                                    <label>Sholat secara:</label>
+                                                    <select name="subuh_jamaah" class="form-control">
+                                                        <option value="berjamaah">Berjamaah</option>
+                                                        <option value="sendirian">Sendirian</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Jam sholat:</label>
+                                                    <input type="time" name="subuh_jam" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="alasan-field" id="subuhAlasanField" style="display: none;">
+                                                <label>Alasan tidak sholat:</label>
+                                                <textarea name="subuh_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dzuhur -->
+                                    <div class="shalat-item">
+                                        <h5>Dzuhur</h5>
+                                        <div class="form-group">
+                                            <label>Apakah sholat Dzuhur?</label>
+                                            <div class="radio-group">
+                                                <label><input type="radio" name="dzuhur_status" value="ya" class="shalat-status" data-shalat="dzuhur"> Ya</label>
+                                                <label><input type="radio" name="dzuhur_status" value="tidak" class="shalat-status" data-shalat="dzuhur"> Tidak</label>
+                                            </div>
+                                            <div class="shalat-detail" id="dzuhurDetail" style="display: none;">
+                                                <div class="form-group">
+                                                    <label>Sholat secara:</label>
+                                                    <select name="dzuhur_jamaah" class="form-control">
+                                                        <option value="berjamaah">Berjamaah</option>
+                                                        <option value="sendirian">Sendirian</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Jam sholat:</label>
+                                                    <input type="time" name="dzuhur_jam" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="alasan-field" id="dzuhurAlasanField" style="display: none;">
+                                                <label>Alasan tidak sholat:</label>
+                                                <textarea name="dzuhur_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Ashar -->
+                                    <div class="shalat-item">
+                                        <h5>Ashar</h5>
+                                        <div class="form-group">
+                                            <label>Apakah sholat Ashar?</label>
+                                            <div class="radio-group">
+                                                <label><input type="radio" name="ashar_status" value="ya" class="shalat-status" data-shalat="ashar"> Ya</label>
+                                                <label><input type="radio" name="ashar_status" value="tidak" class="shalat-status" data-shalat="ashar"> Tidak</label>
+                                            </div>
+                                            <div class="shalat-detail" id="asharDetail" style="display: none;">
+                                                <div class="form-group">
+                                                    <label>Sholat secara:</label>
+                                                    <select name="ashar_jamaah" class="form-control">
+                                                        <option value="berjamaah">Berjamaah</option>
+                                                        <option value="sendirian">Sendirian</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Jam sholat:</label>
+                                                    <input type="time" name="ashar_jam" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="alasan-field" id="asharAlasanField" style="display: none;">
+                                                <label>Alasan tidak sholat:</label>
+                                                <textarea name="ashar_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Magrib -->
+                                    <div class="shalat-item">
+                                        <h5>Magrib</h5>
+                                        <div class="form-group">
+                                            <label>Apakah sholat Magrib?</label>
+                                            <div class="radio-group">
+                                                <label><input type="radio" name="magrib_status" value="ya" class="shalat-status" data-shalat="magrib"> Ya</label>
+                                                <label><input type="radio" name="magrib_status" value="tidak" class="shalat-status" data-shalat="magrib"> Tidak</label>
+                                            </div>
+                                            <div class="shalat-detail" id="magribDetail" style="display: none;">
+                                                <div class="form-group">
+                                                    <label>Sholat secara:</label>
+                                                    <select name="magrib_jamaah" class="form-control">
+                                                        <option value="berjamaah">Berjamaah</option>
+                                                        <option value="sendirian">Sendirian</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Jam sholat:</label>
+                                                    <input type="time" name="magrib_jam" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="alasan-field" id="magribAlasanField" style="display: none;">
+                                                <label>Alasan tidak sholat:</label>
+                                                <textarea name="magrib_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Isya -->
+                                    <div class="shalat-item">
+                                        <h5>Isya</h5>
+                                        <div class="form-group">
+                                            <label>Apakah sholat Isya?</label>
+                                            <div class="radio-group">
+                                                <label><input type="radio" name="isya_status" value="ya" class="shalat-status" data-shalat="isya"> Ya</label>
+                                                <label><input type="radio" name="isya_status" value="tidak" class="shalat-status" data-shalat="isya"> Tidak</label>
+                                            </div>
+                                            <div class="shalat-detail" id="isyaDetail" style="display: none;">
+                                                <div class="form-group">
+                                                    <label>Sholat secara:</label>
+                                                    <select name="isya_jamaah" class="form-control">
+                                                        <option value="berjamaah">Berjamaah</option>
+                                                        <option value="sendirian">Sendirian</option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Jam sholat:</label>
+                                                    <input type="time" name="isya_jam" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="alasan-field" id="isyaAlasanField" style="display: none;">
+                                                <label>Alasan tidak sholat:</label>
+                                                <textarea name="isya_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sholat Tarawih -->
+                                <div class="form-section">
+                                    <h4>3. Sholat Tarawih</h4>
+                                    <div class="form-group">
+                                        <label>Apakah sholat Tarawih?</label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="tarawih_status" value="ya" id="tarawihYa"> Ya</label>
+                                            <label><input type="radio" name="tarawih_status" value="tidak" id="tarawihTidak"> Tidak</label>
+                                        </div>
+                                        <div id="tarawihDetail" style="display: none;">
+                                            <div class="form-group">
+                                                <label>Tempat:</label>
+                                                <input type="text" name="tarawih_tempat" class="form-control" placeholder="Nama masjid/musholla">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Imam:</label>
+                                                <input type="text" name="tarawih_imam" class="form-control" placeholder="Nama imam">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tadarus -->
+                                <div class="form-section">
+                                    <h4>4. Tadarus Al-Qur'an</h4>
+                                    <div class="form-group">
+                                        <label>Apakah tadarus hari ini?</label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="tadarus_status" value="ya" id="tadarusYa"> Ya</label>
+                                            <label><input type="radio" name="tadarus_status" value="tidak" id="tadarusTidak"> Tidak</label>
+                                        </div>
+                                        <div id="tadarusDetail" style="display: none;">
+                                            <div class="form-group">
+                                                <label>Surah:</label>
+                                                <input type="text" name="tadarus_surah" class="form-control" placeholder="Contoh: Al-Baqarah">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Ayat (range):</label>
+                                                <input type="text" name="tadarus_ayat" class="form-control" placeholder="Contoh: 1-10">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Infaq/Shodaqoh -->
+                                <div class="form-section">
+                                    <h4>5. Infaq/Shodaqoh</h4>
+                                    <div class="form-group">
+                                        <label>Apakah bersedekah hari ini?</label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="infaq_status" value="ya"> Ya</label>
+                                            <label><input type="radio" name="infaq_status" value="tidak"> Tidak</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sholat Jumat (kondisional) -->
+                                <div class="form-section" id="jumatSection" style="display: none;">
+                                    <h4>6. Sholat Jumat</h4>
+                                    <div class="form-group">
+                                        <label>Status sholat Jumat:</label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="jumat_status" value="ya"> Ya (Laki-laki)</label>
+                                            <label><input type="radio" name="jumat_status" value="tidak"> Tidak</label>
+                                            <label><input type="radio" name="jumat_status" value="perempuan"> Perempuan (Tidak wajib)</label>
+                                        </div>
+                                        <div id="jumatYaDetail" style="display: none;">
+                                            <div class="form-group">
+                                                <label>Nama Masjid:</label>
+                                                <input type="text" name="jumat_masjid" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Nama Khotib:</label>
+                                                <input type="text" name="jumat_khotib" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div id="jumatTidakAlasan" style="display: none;">
+                                            <label>Alasan tidak sholat Jumat:</label>
+                                            <textarea name="jumat_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sholat Idul Fitri (hanya muncul tanggal 20 Maret 2026) -->
+<div class="form-section" id="idulFitriSection" style="display: none;">
+    <h4>7. Sholat Idul Fitri 1447 H</h4>
+    <div class="alert alert-info">
+        <i class="fas fa-mosque"></i> Hari ini adalah Hari Raya Idul Fitri 1447 H
+    </div>
+    <div class="form-group">
+        <label>Apakah sholat Idul Fitri?</label>
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="idul_fitri_status" value="ya" id="idulFitriYa"> Ya
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="idul_fitri_status" value="tidak" id="idulFitriTidak"> Tidak
+            </label>
+        </div>
+        <div id="idulFitriDetail" style="display: none;">
+            <div class="form-group">
+                <label>Tempat (Masjid/Lapangan):</label>
+                <input type="text" name="idul_fitri_tempat" class="form-control" placeholder="Contoh: Masjid Agung">
+            </div>
+            <div class="form-group">
+                <label>Nama Imam:</label>
+                <input type="text" name="idul_fitri_imam" class="form-control" placeholder="Nama imam">
+            </div>
+            <div class="form-group">
+                <label>Nama Khotib:</label>
+                <input type="text" name="idul_fitri_khotib" class="form-control" placeholder="Nama khotib">
+            </div>
+        </div>
+        <div id="idulFitriAlasan" style="display: none;">
+            <label>Alasan tidak sholat Idul Fitri:</label>
+            <textarea name="idul_fitri_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+        </div>
+    </div>
+</div>
+
+                                <!-- Tombol Submit -->
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">
+                                        <i class="fas fa-save"></i> Simpan Jurnal
+                                    </button>
+                                    <button type="button" class="btn-secondary" onclick="loadExistingData()">
+                                        <i class="fas fa-sync-alt"></i> Muat Data
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Riwayat Jurnal -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> Riwayat Jurnal</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table" id="riwayatTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            <th>Puasa</th>
+                                            <th>Sholat</th>
+                                            <th>Tarawih</th>
+                                            <th>Tadarus</th>
+                                            <th>Infaq</th>
+                                            <th>Skor</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="riwayatBody">
+                                        <!-- Data will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/user-dashboard.js"></script>
+</body>
+</html>

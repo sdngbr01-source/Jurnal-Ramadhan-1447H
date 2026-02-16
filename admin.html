@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Jurnal Ramadhan SDN Gambirono 01</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Panel</h3>
+                <p>Jurnal Ramadhan</p>
+                <p class="school-name">SDN Gambirono 01</p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#" onclick="showSection('dashboard'); return false;"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="#" onclick="showSection('users'); return false;"><i class="fas fa-users"></i> Management User</a></li>
+                    <li><a href="#" onclick="showSection('data'); return false;"><i class="fas fa-database"></i> Management Data</a></li>
+                    <li><a href="#" onclick="showSection('export'); return false;"><i class="fas fa-download"></i> Export Data</a></li>
+                    <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2 id="pageTitle">Dashboard</h2>
+                <div class="admin-info">
+                    <span>Welcome, <span id="adminName">Admin</span></span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- DASHBOARD SECTION -->
+                <section id="dashboardSection" class="content-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalUsers">0</h3>
+                                <p>Total User</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalAdmins">1</h3>
+                                <p>Total Admin</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-pen"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalJurnal">0</h3>
+                                <p>Jurnal Terisi</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalScore">0</h3>
+                                <p>Total Skor</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h4><i class="fas fa-chart-bar"></i> Skor Per Ibadah</h4>
+                            <canvas id="ibadahChart" style="width:100%; max-height:300px;"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h4><i class="fas fa-chart-pie"></i> Statistik Kehadiran</h4>
+                            <canvas id="kehadiranChart" style="width:100%; max-height:300px;"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="stats-detail">
+                        <h4>Detail Skor Ibadah</h4>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span>Skor Puasa:</span>
+                                <strong id="skorPuasa">0</strong>
+                            </div>
+                            <div class="detail-item">
+                                <span>Skor Sholat Wajib:</span>
+                                <strong id="skorSholatWajib">0</strong>
+                            </div>
+                            <div class="detail-item">
+                                <span>Skor Sholat Tarawih:</span>
+                                <strong id="skorTarawih">0</strong>
+                            </div>
+                            <div class="detail-item">
+                                <span>Skor Tadarus:</span>
+                                <strong id="skorTadarus">0</strong>
+                            </div>
+                            <div class="detail-item">
+                                <span>Skor Sholat Jumat:</span>
+                                <strong id="skorJumat">0</strong>
+                            </div>
+                            <div class="detail-item">
+                                <span>Skor Infaq:</span>
+                                <strong id="skorInfaq">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- USERS MANAGEMENT SECTION -->
+                <section id="usersSection" class="content-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-users"></i> Management User</h3>
+                        <div class="header-buttons">
+                            <button class="btn-primary" onclick="showAddUserModal()">
+                                <i class="fas fa-plus"></i> Tambah User
+                            </button>
+                            <button class="btn-success" onclick="showUploadModal()">
+                                <i class="fas fa-upload"></i> Upload Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <input type="text" id="searchUser" placeholder="Cari nama user..." class="form-control">
+                            <select id="filterKelas" class="form-control">
+                                <option value="">Semua Kelas</option>
+                                <option value="1A">Kelas 1A</option>
+                                <option value="1B">Kelas 1B</option>
+                                <option value="2A">Kelas 2A</option>
+                                <option value="2B">Kelas 2B</option>
+                                <option value="3A">Kelas 3A</option>
+                                <option value="3B">Kelas 3B</option>
+                                <option value="4A">Kelas 4A</option>
+                                <option value="4B">Kelas 4B</option>
+                                <option value="5A">Kelas 5A</option>
+                                <option value="5B">Kelas 5B</option>
+                                <option value="6A">Kelas 6A</option>
+                                <option value="6B">Kelas 6B</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Kelas</th>
+                                    <th>Tanggal Daftar</th>
+                                    <th>Terakhir Login</th>
+                                    <th>Jumlah Jurnal</th>
+                                    <th>Total Skor</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center;">Loading data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- DATA MANAGEMENT SECTION -->
+                <section id="dataSection" class="content-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-database"></i> Management Data Jurnal</h3>
+                    </div>
+
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <select id="sortData" class="form-control">
+                                <option value="tertinggi">Skor Tertinggi</option>
+                                <option value="terendah">Skor Terendah</option>
+                                <option value="az">A-Z (Nama)</option>
+                                <option value="za">Z-A (Nama)</option>
+                            </select>
+                            <select id="filterKelasData" class="form-control">
+                                <option value="">Semua Kelas</option>
+                                <option value="1A">Kelas 1A</option>
+                                <option value="1B">Kelas 1B</option>
+                                <option value="2A">Kelas 2A</option>
+                                <option value="2B">Kelas 2B</option>
+                                <option value="3A">Kelas 3A</option>
+                                <option value="3B">Kelas 3B</option>
+                                <option value="4A">Kelas 4A</option>
+                                <option value="4B">Kelas 4B</option>
+                                <option value="5A">Kelas 5A</option>
+                                <option value="5B">Kelas 5B</option>
+                                <option value="6A">Kelas 6A</option>
+                                <option value="6B">Kelas 6B</option>
+                            </select>
+                            <input type="text" id="searchNama" placeholder="Cari nama..." class="form-control">
+                            <input type="date" id="filterTanggal" class="form-control">
+                            <button class="btn-primary" onclick="loadDataTable()">
+                                <i class="fas fa-search"></i> Cari
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">No</th>
+                                    <th rowspan="2">Tanggal</th>
+                                    <th rowspan="2">Nama</th>
+                                    <th rowspan="2">Kelas</th>
+                                    <th colspan="2">Puasa</th>
+                                    <th colspan="3">Subuh</th>
+                                    <th colspan="3">Dzuhur</th>
+                                    <th colspan="3">Ashar</th>
+                                    <th colspan="3">Magrib</th>
+                                    <th colspan="3">Isya</th>
+                                    <th rowspan="2">Tarawih</th>
+                                    <th rowspan="2">Tadarus</th>
+                                    <th rowspan="2">Jumat</th>
+                                    <th rowspan="2">Infaq</th>
+                                    <th rowspan="2">Total Skor</th>
+                                </tr>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Skor</th>
+                                    <th>Status</th>
+                                    <th>Jam</th>
+                                    <th>Skor</th>
+                                    <th>Status</th>
+                                    <th>Jam</th>
+                                    <th>Skor</th>
+                                    <th>Status</th>
+                                    <th>Jam</th>
+                                    <th>Skor</th>
+                                    <th>Status</th>
+                                    <th>Jam</th>
+                                    <th>Skor</th>
+                                    <th>Status</th>
+                                    <th>Jam</th>
+                                    <th>Skor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody">
+                                <tr>
+                                    <td colspan="26" style="text-align: center;">Loading data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- EXPORT SECTION -->
+                <section id="exportSection" class="content-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-download"></i> Export Data</h3>
+                    </div>
+
+                    <div class="export-grid">
+                        <div class="export-card">
+                            <div class="export-icon">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <h4>Export ke Excel</h4>
+                            <p>Download data jurnal dalam format Excel</p>
+                            <div class="form-group">
+                                <label>Filter Kelas:</label>
+                                <select id="exportKelas" class="form-control">
+                                    <option value="">Semua Kelas</option>
+                                    <option value="1A">Kelas 1A</option>
+                                    <option value="1B">Kelas 1B</option>
+                                    <option value="2A">Kelas 2A</option>
+                                    <option value="2B">Kelas 2B</option>
+                                    <option value="3A">Kelas 3A</option>
+                                    <option value="3B">Kelas 3B</option>
+                                    <option value="4A">Kelas 4A</option>
+                                    <option value="4B">Kelas 4B</option>
+                                    <option value="5A">Kelas 5A</option>
+                                    <option value="5B">Kelas 5B</option>
+                                    <option value="6A">Kelas 6A</option>
+                                    <option value="6B">Kelas 6B</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary" onclick="exportToExcel()">
+                                <i class="fas fa-download"></i> Download Excel
+                            </button>
+                        </div>
+
+                        <div class="export-card">
+                            <div class="export-icon">
+                                <i class="fas fa-file-code"></i>
+                            </div>
+                            <h4>Export Data User</h4>
+                            <p>Download data user dalam format JSON</p>
+                            <button class="btn-primary" onclick="exportUsersJSON()">
+                                <i class="fas fa-download"></i> Download JSON
+                            </button>
+                        </div>
+
+                        <div class="export-card">
+                            <div class="export-icon">
+                                <i class="fas fa-file-code"></i>
+                            </div>
+                            <h4>Export Semua Jurnal</h4>
+                            <p>Download semua data jurnal dalam format JSON</p>
+                            <button class="btn-primary" onclick="exportAllJurnalJSON()">
+                                <i class="fas fa-download"></i> Download JSON
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL TAMBAH/EDIT USER -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tambah User Baru</h3>
+                <span class="close" onclick="closeModal('userModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <div class="form-group">
+                        <label for="userNama">Nama Lengkap:</label>
+                        <input type="text" id="userNama" class="form-control" placeholder="Masukkan nama lengkap" required>
+                        <small>Nama akan disimpan dalam huruf kecil</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="userKelas">Kelas:</label>
+                        <select id="userKelas" class="form-control" required>
+                            <option value="">Pilih Kelas</option>
+                            <option value="1A">Kelas 1A</option>
+                            <option value="1B">Kelas 1B</option>
+                            <option value="2A">Kelas 2A</option>
+                            <option value="2B">Kelas 2B</option>
+                            <option value="3A">Kelas 3A</option>
+                            <option value="3B">Kelas 3B</option>
+                            <option value="4A">Kelas 4A</option>
+                            <option value="4B">Kelas 4B</option>
+                            <option value="5A">Kelas 5A</option>
+                            <option value="5B">Kelas 5B</option>
+                            <option value="6A">Kelas 6A</option>
+                            <option value="6B">Kelas 6B</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('userModal')">Batal</button>
+                        <button type="submit" class="btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UPLOAD EXCEL -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload User dari Excel</h3>
+                <span class="close" onclick="closeModal('uploadModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="upload-info">
+                    <p><i class="fas fa-info-circle"></i> Format Excel yang didukung:</p>
+                    <ul>
+                        <li>Kolom A: Nama Lengkap</li>
+                        <li>Kolom B: Kelas (contoh: 1A, 1B, 2A, dst)</li>
+                        <li>Baris pertama harus header</li>
+                    </ul>
+                    <a href="#" onclick="downloadTemplate()" class="template-link">
+                        <i class="fas fa-download"></i> Download Template
+                    </a>
+                </div>
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label for="excelFile">Pilih File Excel:</label>
+                        <input type="file" id="excelFile" accept=".xlsx,.xls" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Preview Data:</label>
+                        <div class="preview-table" id="previewData">
+                            <p class="text-muted">Belum ada file dipilih</p>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('uploadModal')">Batal</button>
+                        <button type="submit" class="btn-success" id="uploadBtn">
+                            <i class="fas fa-upload"></i> Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>
