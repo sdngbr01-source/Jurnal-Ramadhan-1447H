@@ -1,146 +1,136 @@
-// Auth Management - VERSI DENGAN VALIDASI DATABASE
+// Utility Functions
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Tab switching
-    window.switchTab = function(tab) {
-        const tabs = document.querySelectorAll('.tab-btn');
-        const forms = document.querySelectorAll('.login-form');
-        
-        tabs.forEach(btn => btn.classList.remove('active'));
-        forms.forEach(form => form.classList.remove('active'));
-        
-        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
-        document.getElementById(`${tab}LoginForm`).classList.add('active');
+// Format date to Indonesian format
+function formatDate(date) {
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
     };
+    return new Date(date).toLocaleDateString('id-ID', options);
+}
 
-    // User Login - HARUS TERDAFTAR DI DATABASE
-    document.getElementById('userLoginForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const nama = document.getElementById('userNama').value.toLowerCase().trim();
-        
-        if (!nama) {
-            showAlert('Silakan masukkan nama lengkap', 'error');
-            return;
-        }
+// Get current date in YYYY-MM-DD format
+function getCurrentDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
 
-        try {
-            // CEK APAKAH USER TERDAFTAR DI FIRESTORE
-            const userQuery = await usersCollection.where('nama', '==', nama).get();
-            
-            if (userQuery.empty) {
-                // User TIDAK ditemukan di database
-                showAlert('Maaf, nama anda tidak terdaftar. Silakan hubungi admin.', 'error');
-                return;
-            }
+// Check if today is Friday
+function isFriday() {
+    return new Date().getDay() === 5; // 5 = Friday
+}
 
-            // User ditemukan, ambil data
-            const userDoc = userQuery.docs[0];
-            const userId = userDoc.id;
-            const userData = userDoc.data();
-            
-            // Update last login
-            await usersCollection.doc(userId).update({
-                lastLogin: new Date().toISOString()
-            });
+// Calculate score for shalat
+function calculateShalatScore(jamaah) {
+    if (jamaah === 'berjamaah') return 2;
+    if (jamaah === 'sendirian') return 1;
+    return 0;
+}
 
-            // Store user info in session
-            sessionStorage.setItem('userId', userId);
-            sessionStorage.setItem('userNama', nama);
-            sessionStorage.setItem('userRole', 'user');
-
-            showAlert('Login berhasil! Selamat datang ' + userData.nama, 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'dashboard-user.html';
-            }, 1500);
-
-        } catch (error) {
-            console.error('Login error:', error);
-            showAlert('Terjadi kesalahan. Silakan coba lagi.', 'error');
+// Calculate total score
+function calculateTotalScore(jurnal) {
+    let total = 0;
+    
+    // Puasa score
+    if (jurnal.puasa === 'ya') total += 1;
+    
+    // Shalat wajib scores
+    const shalatTimes = ['subuh', 'dzuhur', 'ashar', 'magrib', 'isya'];
+    shalatTimes.forEach(time => {
+        if (jurnal[`shalat_${time}`]?.status === 'ya') {
+            total += calculateShalatScore(jurnal[`shalat_${time}`]?.jamaah);
         }
     });
+    
+    // Tarawih score
+    if (jurnal.tarawih?.status === 'ya') total += 1;
+    
+    // Tadarus score
+    if (jurnal.tadarus?.status === 'ya') total += 1;
+    
+    // Shalat Jumat score (if applicable)
+    if (jurnal.shalat_jumat?.status === 'ya') total += 1;
+    
+    // Infaq score
+    if (jurnal.infaq?.status === 'ya') total += 1;
+    
+    return total;
+}
 
-    // Admin Login
-    document.getElementById('adminLoginForm')?.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const username = document.getElementById('adminUsername').value.trim();
-        const password = document.getElementById('adminPassword').value.trim();
+// Export to Excel
+function exportToExcel(data, filename) {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, `${filename}.xlsx`);
+}
 
-        if (!username || !password) {
-            showAlert('Username dan password harus diisi', 'error');
-            return;
-        }
+// Download JSON
+function downloadJSON(data, filename) {
+    const jsonStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+}
 
-        try {
-            // Check admin in Firestore
-            const adminDoc = await adminCollection.doc(username).get();
-            
-            if (adminDoc.exists && adminDoc.data().password === password) {
-                // Admin authenticated
-                sessionStorage.setItem('adminUsername', username);
-                sessionStorage.setItem('userRole', 'admin');
-                
-                showAlert('Login admin berhasil! Mengalihkan...', 'success');
-                
-                setTimeout(() => {
-                    window.location.href = 'admin.html';
-                }, 1500);
-            } else {
-                showAlert('Username atau password salah', 'error');
-            }
-        } catch (error) {
-            console.error('Admin login error:', error);
-            showAlert('Terjadi kesalahan. Silakan coba lagi.', 'error');
-        }
-    });
+// Show loading spinner
+function showLoading(container) {
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'loading-spinner';
+    loadingDiv.innerHTML = '<div class="spinner"></div><p>Loading...</p>';
+    container.innerHTML = '';
+    container.appendChild(loadingDiv);
+}
 
-    // Show alert function
-    function showAlert(message, type) {
-        // Remove existing alert
-        const existingAlert = document.querySelector('.alert');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-
-        // Create new alert
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert ${type}`;
-        
-        let icon = '';
-        if (type === 'success') icon = 'check-circle';
-        else if (type === 'error') icon = 'exclamation-circle';
-        else icon = 'info-circle';
-        
-        alertDiv.innerHTML = `
-            <i class="fas fa-${icon}"></i>
-            <span>${message}</span>
-        `;
-        
-        // Insert at the top of form
-        const activeForm = document.querySelector('.login-form.active');
-        activeForm.insertBefore(alertDiv, activeForm.firstChild);
-        
-        // Auto remove after 3 seconds
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 3000);
+// Hide loading
+function hideLoading(container) {
+    const spinner = container.querySelector('.loading-spinner');
+    if (spinner) {
+        spinner.remove();
     }
+}
 
-    // Check if user is already logged in
-    if (window.location.pathname.includes('login.html')) {
-        const userRole = sessionStorage.getItem('userRole');
-        if (userRole === 'user') {
-            window.location.href = 'dashboard-user.html';
-        } else if (userRole === 'admin') {
-            window.location.href = 'admin.html';
-        }
-    }
-});
+// Debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
-// Logout function - BALIK KE INDEX.HTML
-window.logout = function() {
-    sessionStorage.clear();
-    window.location.href = 'index.html';
-};
+// Validate date
+function isValidDate(dateString) {
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date);
+}
+
+// Get date range for Ramadhan
+function getRamadhanDates(year) {
+    // This is simplified - in production, use actual Ramadhan dates
+    const start = new Date(year, 2, 10); // Approximate
+    const end = new Date(year, 3, 10); // Approximate
+    return { start, end };
+}
+
+// Check if date is within Ramadhan
+function isWithinRamadhan(date) {
+    // Simplified - implement actual Ramadhan date checking
+    const { start, end } = getRamadhanDates(date.getFullYear());
+    return date >= start && date <= end;
+}
