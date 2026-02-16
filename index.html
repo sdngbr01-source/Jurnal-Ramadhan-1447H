@@ -19,6 +19,9 @@
             <div class="school-badge">
                 <span class="smart-school">Ramadhan 1447H</span>
             </div>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+    <i class="fas fa-bars"></i>
+</button>
             <nav class="nav-menu">
                 <ul>
                     <li><a href="#materi">Materi</a></li>
@@ -236,7 +239,42 @@
             </div>
         </div>
     </footer>
+    <!-- Tambahkan script di bawah footer atau di dalam tag script -->
+<script>
+function toggleMobileMenu() {
+    const navMenu = document.querySelector('.nav-menu');
+    navMenu.classList.toggle('active');
+    
+    // Change icon
+    const icon = document.querySelector('.mobile-menu-toggle i');
+    if (icon.classList.contains('fa-bars')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+    } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+    }
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(event) {
+    const navMenu = document.querySelector('.nav-menu');
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    
+    if (!navMenu || !toggle) return;
+    
+    if (!navMenu.contains(event.target) && !toggle.contains(event.target)) {
+        navMenu.classList.remove('active');
+        const icon = document.querySelector('.mobile-menu-toggle i');
+        if (icon) {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+    }
+});
+</script>
 
     <script src="js/utils.js"></script>
 </body>
+
 </html>
