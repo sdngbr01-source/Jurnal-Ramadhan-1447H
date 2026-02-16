@@ -1,4 +1,5 @@
-// Auth Management
+// Auth Management - VERSI DENGAN VALIDASI DATABASE
+
 document.addEventListener('DOMContentLoaded', function() {
     // Tab switching
     window.switchTab = function(tab) {
@@ -12,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById(`${tab}LoginForm`).classList.add('active');
     };
 
-    // User Login
+    // User Login - HARUS TERDAFTAR DI DATABASE
     document.getElementById('userLoginForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -24,42 +25,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            // Check if user exists in Firestore
+            // CEK APAKAH USER TERDAFTAR DI FIRESTORE
             const userQuery = await usersCollection.where('nama', '==', nama).get();
             
-            let userData;
-            let userId;
-
             if (userQuery.empty) {
-                // Create new user
-                const newUser = {
-                    nama: nama,
-                    kelas: '',
-                    createdAt: new Date().toISOString(),
-                    lastLogin: new Date().toISOString()
-                };
-                
-                const docRef = await usersCollection.add(newUser);
-                userId = docRef.id;
-                userData = newUser;
-            } else {
-                // User exists
-                const userDoc = userQuery.docs[0];
-                userId = userDoc.id;
-                userData = userDoc.data();
-                
-                // Update last login
-                await usersCollection.doc(userId).update({
-                    lastLogin: new Date().toISOString()
-                });
+                // User TIDAK ditemukan di database
+                showAlert('Maaf, nama anda tidak terdaftar. Silakan hubungi admin.', 'error');
+                return;
             }
+
+            // User ditemukan, ambil data
+            const userDoc = userQuery.docs[0];
+            const userId = userDoc.id;
+            const userData = userDoc.data();
+            
+            // Update last login
+            await usersCollection.doc(userId).update({
+                lastLogin: new Date().toISOString()
+            });
 
             // Store user info in session
             sessionStorage.setItem('userId', userId);
             sessionStorage.setItem('userNama', nama);
             sessionStorage.setItem('userRole', 'user');
 
-            showAlert('Login berhasil! Mengalihkan...', 'success');
+            showAlert('Login berhasil! Selamat datang ' + userData.nama, 'success');
             
             setTimeout(() => {
                 window.location.href = 'dashboard-user.html';
@@ -149,8 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Logout function
-function logout() {
+// Logout function - BALIK KE INDEX.HTML
+window.logout = function() {
     sessionStorage.clear();
-    window.location.href = 'login.html';
-}
+    window.location.href = 'index.html';
+};
