@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Dashboard User - Jurnal Ramadhan SDN Gambirono 01</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard User - Jurnal Ramadhan</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,23 +15,14 @@
         <div class="container">
             <div class="nav-brand">
                 <h2>Jurnal Ramadhan</h2>
-                <p>Selamat datang, <span id="userNameDisplay">User</span></p>
-                <!-- Tombol menu mobile -->
-                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+                <p>Selamat datang, <span id="userNameDisplay"></span></p>
             </div>
             <div class="nav-menu">
-                <ul>
-                    <li><a href="index.html">Beranda</a></li>
-                    <li><a href="#jurnalForm">Jurnal</a></li>
-                    <li><a href="#riwayat">Riwayat</a></li>
-                </ul>
-            </div>
-            <div class="nav-menu desktop">
                 <div class="date-picker">
                     <label for="tanggal">Tanggal:</label>
-                    <input type="date" id="tanggal" class="form-control">
+                    <input type="date" id="tanggal" class="form-control" max="2025-03-31">
                 </div>
-                <button onclick="logoutUser()" class="btn-logout">
+                <button onclick="logout()" class="btn-logout">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
@@ -41,20 +32,16 @@
     <!-- Main Content -->
     <main class="dashboard-main">
         <div class="container">
-            <!-- Alert untuk pesan -->
-            <div id="alertContainer"></div>
-
-            <!-- Form Jurnal -->
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
                             <h3><i class="fas fa-pen-alt"></i> Jurnal Harian Ramadhan</h3>
-                            <div class="alert alert-info" id="dateInfo">Mengisi jurnal untuk hari ini</div>
+                            <div class="alert alert-info" id="dateInfo"></div>
                         </div>
                         <div class="card-body">
                             <form id="jurnalForm">
-                                <!-- PUASA -->
+                                <!-- Puasa -->
                                 <div class="form-section">
                                     <h4>1. Puasa Ramadhan</h4>
                                     <div class="form-group">
@@ -74,13 +61,13 @@
                                     </div>
                                 </div>
 
-                                <!-- SHOLAT WAJIB -->
+                                <!-- Sholat Wajib -->
                                 <div class="form-section">
                                     <h4>2. Sholat Wajib</h4>
                                     
                                     <!-- Subuh -->
                                     <div class="shalat-item">
-                                        <h5>Sholat Subuh</h5>
+                                        <h5>Subuh</h5>
                                         <div class="form-group">
                                             <label>Apakah sholat Subuh?</label>
                                             <div class="radio-group">
@@ -109,7 +96,7 @@
 
                                     <!-- Dzuhur -->
                                     <div class="shalat-item">
-                                        <h5>Sholat Dzuhur</h5>
+                                        <h5>Dzuhur</h5>
                                         <div class="form-group">
                                             <label>Apakah sholat Dzuhur?</label>
                                             <div class="radio-group">
@@ -138,7 +125,7 @@
 
                                     <!-- Ashar -->
                                     <div class="shalat-item">
-                                        <h5>Sholat Ashar</h5>
+                                        <h5>Ashar</h5>
                                         <div class="form-group">
                                             <label>Apakah sholat Ashar?</label>
                                             <div class="radio-group">
@@ -167,7 +154,7 @@
 
                                     <!-- Magrib -->
                                     <div class="shalat-item">
-                                        <h5>Sholat Magrib</h5>
+                                        <h5>Magrib</h5>
                                         <div class="form-group">
                                             <label>Apakah sholat Magrib?</label>
                                             <div class="radio-group">
@@ -196,7 +183,7 @@
 
                                     <!-- Isya -->
                                     <div class="shalat-item">
-                                        <h5>Sholat Isya</h5>
+                                        <h5>Isya</h5>
                                         <div class="form-group">
                                             <label>Apakah sholat Isya?</label>
                                             <div class="radio-group">
@@ -224,14 +211,14 @@
                                     </div>
                                 </div>
 
-                                <!-- TARAWIH -->
+                                <!-- Sholat Tarawih -->
                                 <div class="form-section">
                                     <h4>3. Sholat Tarawih</h4>
                                     <div class="form-group">
                                         <label>Apakah sholat Tarawih?</label>
                                         <div class="radio-group">
-                                            <label><input type="radio" name="tarawih_status" value="ya"> Ya</label>
-                                            <label><input type="radio" name="tarawih_status" value="tidak"> Tidak</label>
+                                            <label><input type="radio" name="tarawih_status" value="ya" id="tarawihYa"> Ya</label>
+                                            <label><input type="radio" name="tarawih_status" value="tidak" id="tarawihTidak"> Tidak</label>
                                         </div>
                                         <div id="tarawihDetail" style="display: none;">
                                             <div class="form-group">
@@ -246,14 +233,14 @@
                                     </div>
                                 </div>
 
-                                <!-- TADARUS -->
+                                <!-- Tadarus -->
                                 <div class="form-section">
                                     <h4>4. Tadarus Al-Qur'an</h4>
                                     <div class="form-group">
                                         <label>Apakah tadarus hari ini?</label>
                                         <div class="radio-group">
-                                            <label><input type="radio" name="tadarus_status" value="ya"> Ya</label>
-                                            <label><input type="radio" name="tadarus_status" value="tidak"> Tidak</label>
+                                            <label><input type="radio" name="tadarus_status" value="ya" id="tadarusYa"> Ya</label>
+                                            <label><input type="radio" name="tadarus_status" value="tidak" id="tadarusTidak"> Tidak</label>
                                         </div>
                                         <div id="tadarusDetail" style="display: none;">
                                             <div class="form-group">
@@ -268,7 +255,7 @@
                                     </div>
                                 </div>
 
-                                <!-- INFAQ -->
+                                <!-- Infaq/Shodaqoh -->
                                 <div class="form-section">
                                     <h4>5. Infaq/Shodaqoh</h4>
                                     <div class="form-group">
@@ -280,10 +267,77 @@
                                     </div>
                                 </div>
 
-                                <!-- TOMBOL SIMPAN -->
+                                <!-- Sholat Jumat (kondisional) -->
+                                <div class="form-section" id="jumatSection" style="display: none;">
+                                    <h4>6. Sholat Jumat</h4>
+                                    <div class="form-group">
+                                        <label>Status sholat Jumat:</label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="jumat_status" value="ya"> Ya (Laki-laki)</label>
+                                            <label><input type="radio" name="jumat_status" value="tidak"> Tidak</label>
+                                            <label><input type="radio" name="jumat_status" value="perempuan"> Perempuan (Tidak wajib)</label>
+                                        </div>
+                                        <div id="jumatYaDetail" style="display: none;">
+                                            <div class="form-group">
+                                                <label>Nama Masjid:</label>
+                                                <input type="text" name="jumat_masjid" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Nama Khotib:</label>
+                                                <input type="text" name="jumat_khotib" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div id="jumatTidakAlasan" style="display: none;">
+                                            <label>Alasan tidak sholat Jumat:</label>
+                                            <textarea name="jumat_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sholat Idul Fitri (hanya muncul tanggal 20 Maret 2026) -->
+<div class="form-section" id="idulFitriSection" style="display: none;">
+    <h4>7. Sholat Idul Fitri 1447 H</h4>
+    <div class="alert alert-info">
+        <i class="fas fa-mosque"></i> Hari ini adalah Hari Raya Idul Fitri 1447 H
+    </div>
+    <div class="form-group">
+        <label>Apakah sholat Idul Fitri?</label>
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="idul_fitri_status" value="ya" id="idulFitriYa"> Ya
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="idul_fitri_status" value="tidak" id="idulFitriTidak"> Tidak
+            </label>
+        </div>
+        <div id="idulFitriDetail" style="display: none;">
+            <div class="form-group">
+                <label>Tempat (Masjid/Lapangan):</label>
+                <input type="text" name="idul_fitri_tempat" class="form-control" placeholder="Contoh: Masjid Agung">
+            </div>
+            <div class="form-group">
+                <label>Nama Imam:</label>
+                <input type="text" name="idul_fitri_imam" class="form-control" placeholder="Nama imam">
+            </div>
+            <div class="form-group">
+                <label>Nama Khotib:</label>
+                <input type="text" name="idul_fitri_khotib" class="form-control" placeholder="Nama khotib">
+            </div>
+        </div>
+        <div id="idulFitriAlasan" style="display: none;">
+            <label>Alasan tidak sholat Idul Fitri:</label>
+            <textarea name="idul_fitri_alasan" class="form-control" placeholder="Tuliskan alasan..."></textarea>
+        </div>
+    </div>
+</div>
+
+                                <!-- Tombol Submit -->
                                 <div class="form-actions">
-                                    <button type="submit" class="btn-primary" id="simpanBtn">
+                                    <button type="submit" class="btn-primary">
                                         <i class="fas fa-save"></i> Simpan Jurnal
+                                    </button>
+                                    <button type="button" class="btn-secondary" onclick="loadExistingData()">
+                                        <i class="fas fa-sync-alt"></i> Muat Data
                                     </button>
                                 </div>
                             </form>
@@ -292,7 +346,7 @@
                 </div>
             </div>
 
-            <!-- RIWAYAT JURNAL -->
+            <!-- Riwayat Jurnal -->
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="card">
@@ -301,7 +355,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table" id="riwayatTable">
                                     <thead>
                                         <tr>
                                             <th>Tanggal</th>
@@ -311,12 +365,11 @@
                                             <th>Tadarus</th>
                                             <th>Infaq</th>
                                             <th>Skor</th>
+                                            <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody id="riwayatBody">
-                                        <tr>
-                                            <td colspan="7" style="text-align: center;">Loading...</td>
-                                        </tr>
+                                        <!-- Data will be loaded here -->
                                     </tbody>
                                 </table>
                             </div>
@@ -327,546 +380,13 @@
         </div>
     </main>
 
-    <!-- Scripts -->
+    <!-- Footer -->
+    <div id="footer"></div>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js"></script>
-    
-    <script>
-    // ============================================
-    // USER DASHBOARD JAVASCRIPT - VERSI SEDERHANA
-    // ============================================
-    
-    // Global variables
-    let currentUserId = '';
-    let currentUserNama = '';
-    
-    // Inisialisasi saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Dashboard user dimuat');
-        
-        // Cek login
-        currentUserId = sessionStorage.getItem('userId');
-        currentUserNama = sessionStorage.getItem('userNama');
-        
-        if (!currentUserId) {
-            alert('Silakan login terlebih dahulu');
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        // Tampilkan nama user
-        const nameDisplay = document.getElementById('userNameDisplay');
-        if (nameDisplay) nameDisplay.textContent = currentUserNama;
-        
-        // Set tanggal hari ini
-        const today = new Date().toISOString().split('T')[0];
-        const tanggalInput = document.getElementById('tanggal');
-        if (tanggalInput) {
-            tanggalInput.value = today;
-            tanggalInput.max = today;
-        }
-        
-        // Load data jurnal hari ini
-        loadJurnalHariIni();
-        
-        // Load riwayat
-        loadRiwayat();
-        
-        // Setup event listeners form
-        setupFormHandlers();
-        
-        // Setup form submit
-        const form = document.getElementById('jurnalForm');
-        if (form) {
-            form.addEventListener('submit', simpanJurnal);
-        }
-        
-        // Setup date change
-        if (tanggalInput) {
-            tanggalInput.addEventListener('change', loadJurnalHariIni);
-        }
-    });
-    
-    // Setup handler untuk radio button
-    function setupFormHandlers() {
-        // Puasa handler
-        const puasaRadios = document.querySelectorAll('input[name="puasa"]');
-        puasaRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const alasanField = document.getElementById('alasanPuasaField');
-                if (alasanField) {
-                    alasanField.style.display = this.value === 'tidak' ? 'block' : 'none';
-                }
-            });
-        });
-        
-        // Shalat handlers
-        const shalatRadios = document.querySelectorAll('.shalat-status');
-        shalatRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const shalat = this.dataset.shalat;
-                const detailDiv = document.getElementById(shalat + 'Detail');
-                const alasanDiv = document.getElementById(shalat + 'AlasanField');
-                
-                if (this.value === 'ya') {
-                    if (detailDiv) detailDiv.style.display = 'block';
-                    if (alasanDiv) alasanDiv.style.display = 'none';
-                } else {
-                    if (detailDiv) detailDiv.style.display = 'none';
-                    if (alasanDiv) alasanDiv.style.display = 'block';
-                }
-            });
-        });
-        
-        // Tarawih handler
-        const tarawihYa = document.querySelector('input[name="tarawih_status"][value="ya"]');
-        const tarawihTidak = document.querySelector('input[name="tarawih_status"][value="tidak"]');
-        
-        if (tarawihYa) {
-            tarawihYa.addEventListener('change', function() {
-                document.getElementById('tarawihDetail').style.display = 'block';
-            });
-        }
-        if (tarawihTidak) {
-            tarawihTidak.addEventListener('change', function() {
-                document.getElementById('tarawihDetail').style.display = 'none';
-            });
-        }
-        
-        // Tadarus handler
-        const tadarusYa = document.querySelector('input[name="tadarus_status"][value="ya"]');
-        const tadarusTidak = document.querySelector('input[name="tadarus_status"][value="tidak"]');
-        
-        if (tadarusYa) {
-            tadarusYa.addEventListener('change', function() {
-                document.getElementById('tadarusDetail').style.display = 'block';
-            });
-        }
-        if (tadarusTidak) {
-            tadarusTidak.addEventListener('change', function() {
-                document.getElementById('tadarusDetail').style.display = 'none';
-            });
-        }
-    }
-    
-    // Fungsi simpan jurnal
-    async function simpanJurnal(e) {
-        e.preventDefault();
-        
-        console.log('Menyimpan jurnal...');
-        
-        const tanggal = document.getElementById('tanggal')?.value;
-        if (!tanggal) {
-            tampilkanPesan('Pilih tanggal terlebih dahulu', 'error');
-            return;
-        }
-        
-        // Tampilkan loading
-        const simpanBtn = document.getElementById('simpanBtn');
-        const originalText = simpanBtn.innerHTML;
-        simpanBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-        simpanBtn.disabled = true;
-        
-        try {
-            // Kumpulkan data
-            const jurnalData = {
-                userId: currentUserId,
-                tanggal: tanggal,
-                puasa: {
-                    status: getRadioValue('puasa'),
-                    alasan: getTextareaValue('alasanPuasa')
-                },
-                shalat: {},
-                tarawih: {
-                    status: getRadioValue('tarawih_status'),
-                    tempat: getInputValue('tarawih_tempat'),
-                    imam: getInputValue('tarawih_imam')
-                },
-                tadarus: {
-                    status: getRadioValue('tadarus_status'),
-                    surah: getInputValue('tadarus_surah'),
-                    ayat: getInputValue('tadarus_ayat')
-                },
-                infaq: getRadioValue('infaq_status'),
-                createdAt: new Date().toISOString()
-            };
-            
-            // Shalat wajib
-            const shalatTimes = ['subuh', 'dzuhur', 'ashar', 'magrib', 'isya'];
-            shalatTimes.forEach(time => {
-                jurnalData.shalat[time] = {
-                    status: getRadioValue(`${time}_status`),
-                    jamaah: getSelectValue(`${time}_jamaah`),
-                    jam: getInputValue(`${time}_jam`),
-                    alasan: getTextareaValue(`${time}_alasan`)
-                };
-            });
-            
-            // Hitung skor
-            jurnalData.totalScore = hitungSkor(jurnalData);
-            
-            console.log('Data jurnal:', jurnalData);
-            
-            // Cek apakah sudah ada jurnal untuk tanggal ini
-            const querySnapshot = await jurnalCollection
-                .where('userId', '==', currentUserId)
-                .where('tanggal', '==', tanggal)
-                .get();
-            
-            if (!querySnapshot.empty) {
-                // Update
-                const docId = querySnapshot.docs[0].id;
-                await jurnalCollection.doc(docId).update(jurnalData);
-                tampilkanPesan('Jurnal berhasil diperbarui!', 'success');
-            } else {
-                // Tambah baru
-                await jurnalCollection.add(jurnalData);
-                tampilkanPesan('Jurnal berhasil disimpan!', 'success');
-            }
-            
-            // Reload riwayat
-            loadRiwayat();
-            
-        } catch (error) {
-            console.error('Error:', error);
-            tampilkanPesan('Gagal menyimpan: ' + error.message, 'error');
-        } finally {
-            // Kembalikan tombol
-            simpanBtn.innerHTML = originalText;
-            simpanBtn.disabled = false;
-        }
-    }
-    
-    // Load jurnal hari ini
-    async function loadJurnalHariIni() {
-        const tanggal = document.getElementById('tanggal')?.value;
-        if (!tanggal) return;
-        
-        try {
-            const querySnapshot = await jurnalCollection
-                .where('userId', '==', currentUserId)
-                .where('tanggal', '==', tanggal)
-                .get();
-            
-            // Reset form
-            resetForm();
-            
-            if (!querySnapshot.empty) {
-                const data = querySnapshot.docs[0].data();
-                isiForm(data);
-                document.getElementById('dateInfo').textContent = 
-                    `Menampilkan jurnal tanggal ${formatTanggal(tanggal)}`;
-            } else {
-                document.getElementById('dateInfo').textContent = 
-                    `Mengisi jurnal baru untuk tanggal ${formatTanggal(tanggal)}`;
-            }
-            
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-    
-    // Load riwayat
-    async function loadRiwayat() {
-        try {
-            const querySnapshot = await jurnalCollection
-                .where('userId', '==', currentUserId)
-                .orderBy('tanggal', 'desc')
-                .limit(10)
-                .get();
-            
-            const tbody = document.getElementById('riwayatBody');
-            
-            if (querySnapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Belum ada jurnal</td></tr>';
-                return;
-            }
-            
-            let html = '';
-            querySnapshot.forEach(doc => {
-                const data = doc.data();
-                html += `
-                    <tr>
-                        <td>${formatTanggal(data.tanggal)}</td>
-                        <td>${data.puasa?.status === 'ya' ? '✅' : '❌'}</td>
-                        <td>${hitungShalat(data.shalat)}/5</td>
-                        <td>${data.tarawih?.status === 'ya' ? '✅' : '❌'}</td>
-                        <td>${data.tadarus?.status === 'ya' ? '✅' : '❌'}</td>
-                        <td>${data.infaq === 'ya' ? '✅' : '❌'}</td>
-                        <td><strong>${data.totalScore || 0}</strong></td>
-                    </tr>
-                `;
-            });
-            
-            tbody.innerHTML = html;
-            
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-    
-    // ============================================
-    // FUNGSI BANTU
-    // ============================================
-    
-    function getRadioValue(name) {
-        const radio = document.querySelector(`input[name="${name}"]:checked`);
-        return radio ? radio.value : null;
-    }
-    
-    function getInputValue(name) {
-        const input = document.querySelector(`input[name="${name}"]`);
-        return input ? input.value : '';
-    }
-    
-    function getSelectValue(name) {
-        const select = document.querySelector(`select[name="${name}"]`);
-        return select ? select.value : '';
-    }
-    
-    function getTextareaValue(name) {
-        const textarea = document.querySelector(`textarea[name="${name}"]`);
-        return textarea ? textarea.value : '';
-    }
-    
-    function resetForm() {
-        // Reset semua radio
-        document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
-        
-        // Reset semua input
-        document.querySelectorAll('input[type="text"], input[type="time"]').forEach(input => input.value = '');
-        
-        // Reset semua select
-        document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-        
-        // Reset semua textarea
-        document.querySelectorAll('textarea').forEach(textarea => textarea.value = '');
-        
-        // Sembunyikan semua detail
-        document.querySelectorAll('.shalat-detail, .alasan-field, #tarawihDetail, #tadarusDetail').forEach(el => {
-            el.style.display = 'none';
-        });
-    }
-    
-    function isiForm(data) {
-        // Isi puasa
-        if (data.puasa) {
-            setRadioValue('puasa', data.puasa.status);
-            if (data.puasa.alasan) {
-                const alasan = document.querySelector('textarea[name="alasanPuasa"]');
-                if (alasan) alasan.value = data.puasa.alasan;
-                if (data.puasa.status === 'tidak') {
-                    document.getElementById('alasanPuasaField').style.display = 'block';
-                }
-            }
-        }
-        
-        // Isi shalat
-        if (data.shalat) {
-            Object.entries(data.shalat).forEach(([time, shalat]) => {
-                setRadioValue(`${time}_status`, shalat.status);
-                
-                if (shalat.status === 'ya') {
-                    const jamaah = document.querySelector(`select[name="${time}_jamaah"]`);
-                    if (jamaah && shalat.jamaah) jamaah.value = shalat.jamaah;
-                    
-                    const jam = document.querySelector(`input[name="${time}_jam"]`);
-                    if (jam && shalat.jam) jam.value = shalat.jam;
-                    
-                    document.getElementById(`${time}Detail`).style.display = 'block';
-                } else if (shalat.status === 'tidak' && shalat.alasan) {
-                    const alasan = document.querySelector(`textarea[name="${time}_alasan"]`);
-                    if (alasan) alasan.value = shalat.alasan;
-                    document.getElementById(`${time}AlasanField`).style.display = 'block';
-                }
-            });
-        }
-        
-        // Isi tarawih
-        if (data.tarawih) {
-            setRadioValue('tarawih_status', data.tarawih.status);
-            if (data.tarawih.status === 'ya') {
-                const tempat = document.querySelector('input[name="tarawih_tempat"]');
-                if (tempat) tempat.value = data.tarawih.tempat || '';
-                
-                const imam = document.querySelector('input[name="tarawih_imam"]');
-                if (imam) imam.value = data.tarawih.imam || '';
-                
-                document.getElementById('tarawihDetail').style.display = 'block';
-            }
-        }
-        
-        // Isi tadarus
-        if (data.tadarus) {
-            setRadioValue('tadarus_status', data.tadarus.status);
-            if (data.tadarus.status === 'ya') {
-                const surah = document.querySelector('input[name="tadarus_surah"]');
-                if (surah) surah.value = data.tadarus.surah || '';
-                
-                const ayat = document.querySelector('input[name="tadarus_ayat"]');
-                if (ayat) ayat.value = data.tadarus.ayat || '';
-                
-                document.getElementById('tadarusDetail').style.display = 'block';
-            }
-        }
-        
-        // Isi infaq
-        setRadioValue('infaq_status', data.infaq);
-    }
-    
-    function setRadioValue(name, value) {
-        const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
-        if (radio) radio.checked = true;
-    }
-    
-    function hitungSkor(data) {
-        let score = 0;
-        
-        // Puasa
-        if (data.puasa?.status === 'ya') score += 1;
-        
-        // Shalat wajib
-        if (data.shalat) {
-            Object.values(data.shalat).forEach(shalat => {
-                if (shalat?.status === 'ya') {
-                    score += shalat.jamaah === 'berjamaah' ? 2 : 1;
-                }
-            });
-        }
-        
-        // Tarawih
-        if (data.tarawih?.status === 'ya') score += 1;
-        
-        // Tadarus
-        if (data.tadarus?.status === 'ya') score += 1;
-        
-        // Infaq
-        if (data.infaq === 'ya') score += 1;
-        
-        return score;
-    }
-    
-    function hitungShalat(shalat) {
-        if (!shalat) return 0;
-        return Object.values(shalat).filter(s => s?.status === 'ya').length;
-    }
-    
-    function formatTanggal(tanggal) {
-        if (!tanggal) return '-';
-        const parts = tanggal.split('-');
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
-    
-    function tampilkanPesan(teks, tipe) {
-        const container = document.getElementById('alertContainer');
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${tipe}`;
-        alertDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${teks}`;
-        
-        container.innerHTML = '';
-        container.appendChild(alertDiv);
-        
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 3000);
-    }
-    
-    // ============================================
-    // FUNGSI MOBILE
-    // ============================================
-    
-    window.toggleMobileMenu = function() {
-        const menu = document.querySelector('.nav-menu');
-        if (menu) {
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        }
-    };
-    
-    window.logoutUser = function() {
-        if (confirm('Apakah Anda yakin ingin keluar?')) {
-            sessionStorage.clear();
-            window.location.href = 'index.html';
-        }
-    };
-    </script>
-    
-    <!-- CSS Mobile Sederhana -->
-    <style>
-    @media screen and (max-width: 768px) {
-        .dashboard-nav .container {
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-        
-        .nav-brand {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .mobile-menu-toggle {
-            display: block;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px 10px;
-        }
-        
-        .nav-menu.desktop {
-            display: none;
-        }
-        
-        .nav-menu {
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .nav-menu ul {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .nav-menu a {
-            display: block;
-            padding: 12px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            text-align: center;
-        }
-        
-        .date-picker {
-            width: 100%;
-            margin: 10px 0;
-        }
-        
-        .btn-logout {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .radio-group {
-            flex-direction: column;
-        }
-        
-        .form-actions button {
-            width: 100%;
-        }
-    }
-    
-    @media screen and (min-width: 769px) {
-        .mobile-menu-toggle {
-            display: none;
-        }
-        
-        .nav-menu {
-            display: block !important;
-        }
-    }
-    </style>
+    <script src="js/user-dashboard.js"></script>
 </body>
 </html>
