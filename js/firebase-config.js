@@ -9,7 +9,7 @@ const firebaseConfig = {
     appId: "1:19421027338:web:a6f8094dbfa1e9038693f3"
 };
 
-// Initialize Firebase (hanya sekali)
+// Initialize Firebase
 try {
     firebase.initializeApp(firebaseConfig);
     console.log('✅ Firebase initialized');
@@ -20,26 +20,10 @@ try {
 // Initialize services
 const db = firebase.firestore();
 
-// Atur pengaturan Firestore
+// Atur pengaturan Firestore - TANPA PERSISTENCE
 db.settings({
-    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
     ignoreUndefinedProperties: true
 });
-
-// Enable offline persistence
-db.enablePersistence({
-    synchronizeTabs: true
-})
-    .then(() => {
-        console.log('✅ Offline persistence enabled');
-    })
-    .catch((err) => {
-        if (err.code == 'failed-precondition') {
-            console.log('ℹ️ Persistence failed: Multiple tabs open');
-        } else if (err.code == 'unimplemented') {
-            console.log('ℹ️ Persistence not supported');
-        }
-    });
 
 // Collections
 const usersCollection = db.collection('users');
