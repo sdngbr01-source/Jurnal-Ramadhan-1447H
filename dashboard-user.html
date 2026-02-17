@@ -388,458 +388,162 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/user-dashboard.js"></script>
-<!-- Tambahkan script ini di user-dashboard.html sebelum </body> -->
+<!-- SCRIPT SEDERHANA UNTUK MOBILE - PASTI BISA -->
 <script>
-// Perbaikan untuk tampilan mobile - tombol logout berfungsi
+// Fungsi logout sederhana
+function logoutUser() {
+    // Tanya konfirmasi
+    if (confirm('Apakah Anda yakin ingin keluar?')) {
+        // Hapus session
+        sessionStorage.clear();
+        // Langsung pindah ke index
+        window.location.href = 'index.html';
+    }
+    return false;
+}
+
+// Pasang tombol logout di semua tempat
 document.addEventListener('DOMContentLoaded', function() {
-    const style = document.createElement('style');
-    style.textContent = `
-        /* ===== PERBAIKAN MOBILE USER DASHBOARD ===== */
-        
-        /* Hapus semua efek blur */
-        body.menu-open .dashboard-main,
-        body.menu-open main,
-        body.menu-open .hero,
-        body.menu-open .container {
-            filter: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-        }
-        
-        /* Tombol logout mobile yang fixed */
-        @media screen and (max-width: 768px) {
-            /* Perbaikan header mobile */
-            .dashboard-nav {
-                padding: 5px 0;
-                background: linear-gradient(135deg, #1e3c72, #2a5298);
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            }
-            
-            .dashboard-nav .container {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
-                position: relative;
-                padding: 5px 15px;
-            }
-            
-            .nav-brand {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-            }
-            
-            .nav-brand h2 {
-                font-size: 1.1rem;
-                margin: 0;
-                color: white;
-            }
-            
-            .nav-brand p {
-                font-size: 0.7rem;
-                margin: 0;
-                color: rgba(255,255,255,0.9);
-            }
-            
-            /* Tombol menu toggle */
-            .mobile-menu-toggle {
-                display: block;
-                background: transparent;
-                border: none;
-                color: white;
-                font-size: 1.5rem;
-                cursor: pointer;
-                padding: 8px 12px;
-                border-radius: 5px;
-                transition: background 0.3s;
-            }
-            
-            .mobile-menu-toggle:active {
-                background: rgba(255,255,255,0.2);
-            }
-            
-            /* Tombol logout mobile - selalu terlihat */
-            .btn-logout-mobile {
-                display: block;
-                width: 100%;
-                padding: 12px;
-                background: #ff4757;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                text-align: center;
-                margin: 5px 0;
-                transition: all 0.3s;
-                -webkit-tap-highlight-color: transparent;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            }
-            
-            .btn-logout-mobile:active {
-                background: #ff6b81;
-                transform: scale(0.98);
-            }
-            
-            .btn-logout-mobile i {
-                margin-right: 8px;
-            }
-            
-            /* Tombol logout di menu mobile */
-            .mobile-logout-btn {
-                display: block;
-                width: 100%;
-                padding: 15px;
-                background: #ff4757;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 1.1rem;
-                font-weight: 600;
-                cursor: pointer;
-                text-align: center;
-                margin-top: 20px;
-                transition: all 0.3s;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            }
-            
-            .mobile-logout-btn:active {
-                background: #ff6b81;
-                transform: scale(0.98);
-            }
-            
-            .mobile-logout-btn i {
-                margin-right: 8px;
-            }
-            
-            /* Sembunyikan tombol logout desktop di mobile */
-            .btn-logout {
-                display: none !important;
-            }
-            
-            /* Date picker mobile */
-            .date-picker {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                background: rgba(255,255,255,0.15);
-                padding: 8px 12px;
-                border-radius: 8px;
-                margin: 5px 0;
-            }
-            
-            .date-picker label {
-                color: white;
-                font-size: 0.9rem;
-                white-space: nowrap;
-                font-weight: 500;
-            }
-            
-            .date-picker input {
-                flex: 1;
-                padding: 8px 12px;
-                border: none;
-                border-radius: 5px;
-                font-size: 1rem;
-                background: white;
-                color: #333;
-            }
-            
-            /* Perbaikan menu mobile */
-            .nav-menu {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 280px;
-                height: 100vh;
-                background: linear-gradient(135deg, #1e3c72, #2a5298);
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 2000;
-                padding: 60px 20px 20px;
-                overflow-y: auto;
-                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-            }
-            
-            .nav-menu.active {
-                transform: translateX(0);
-            }
-            
-            .nav-menu ul {
-                flex-direction: column;
-                padding: 0;
-                margin: 0;
-            }
-            
-            .nav-menu li {
-                margin: 8px 0;
-                list-style: none;
-            }
-            
-            .nav-menu a {
-                display: block;
-                padding: 15px;
-                background: rgba(255,255,255,0.1);
-                border-radius: 8px;
-                color: white;
-                text-decoration: none;
-                font-size: 1rem;
-                text-align: left;
-                transition: background 0.3s;
-            }
-            
-            .nav-menu a:active {
-                background: rgba(255,215,0,0.3);
-            }
-            
-            .nav-menu a i {
-                margin-right: 12px;
-                width: 20px;
-                text-align: center;
-            }
-            
-            /* Tombol close menu */
-            .mobile-menu-close {
-                position: absolute;
-                top: 15px;
-                right: 15px;
-                background: rgba(255,255,255,0.2);
-                border: none;
-                color: white;
-                font-size: 1.2rem;
-                cursor: pointer;
-                z-index: 2001;
-                padding: 10px 15px;
-                border-radius: 5px;
-                transition: background 0.3s;
-            }
-            
-            .mobile-menu-close:active {
-                background: rgba(255,255,255,0.3);
-            }
-            
-            /* Overlay saat menu terbuka */
-            .menu-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0,0,0,0.5);
-                z-index: 1999;
-            }
-            
-            .menu-overlay.active {
-                display: block;
-            }
-            
-            /* Prevent body scroll saat menu terbuka */
-            body.menu-open {
-                overflow: hidden;
-            }
-            
-            /* User info di menu */
-            .menu-user-info {
-                text-align: center;
-                padding: 20px 0;
-                margin-bottom: 20px;
-                border-bottom: 1px solid rgba(255,255,255,0.2);
-            }
-            
-            .menu-user-info i {
-                font-size: 3rem;
-                color: #ffd700;
-                margin-bottom: 10px;
-            }
-            
-            .menu-user-info h4 {
-                color: white;
-                margin: 5px 0;
-                font-size: 1.2rem;
-            }
-            
-            .menu-user-info p {
-                color: rgba(255,255,255,0.8);
-                font-size: 0.9rem;
-                margin: 0;
-            }
-        }
-        
-        /* Desktop styles */
-        @media screen and (min-width: 769px) {
-            .btn-logout-mobile,
-            .mobile-logout-btn,
-            .mobile-menu-close,
-            .menu-overlay,
-            .menu-user-info {
-                display: none !important;
-            }
-            
-            .btn-logout {
-                display: flex !important;
-            }
-        }
-        
-        /* Animasi */
-        @keyframes slideIn {
-            from {
-                transform: translateX(-100%);
-            }
-            to {
-                transform: translateX(0);
-            }
-        }
-    `;
+    // Cari semua tombol logout dan pasang fungsi
+    const logoutButtons = document.querySelectorAll('.btn-logout, .btn-logout-mobile, [onclick="logout()"]');
+    logoutButtons.forEach(button => {
+        // Hapus onclick lama
+        button.removeAttribute('onclick');
+        // Pasang event listener baru
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            logoutUser();
+        });
+    });
     
-    document.head.appendChild(style);
-    
-    // Tambahkan tombol logout mobile ke DOM
-    const dashboardNav = document.querySelector('.dashboard-nav .container');
-    if (dashboardNav) {
-        // Cek apakah sudah ada tombol logout mobile
+    // Buat tombol logout mobile jika belum ada
+    const container = document.querySelector('.dashboard-nav .container');
+    if (container && window.innerWidth <= 768) {
+        // Cek apakah sudah ada
         if (!document.querySelector('.btn-logout-mobile')) {
-            // Buat tombol logout mobile
-            const logoutMobileBtn = document.createElement('button');
-            logoutMobileBtn.className = 'btn-logout-mobile';
-            logoutMobileBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-            logoutMobileBtn.setAttribute('aria-label', 'Logout');
-            
-            // Tambahkan event listener langsung
-            logoutMobileBtn.addEventListener('click', function(e) {
+            const mobileLogout = document.createElement('button');
+            mobileLogout.className = 'btn-logout-mobile';
+            mobileLogout.innerHTML = '<i class="fas fa-sign-out-alt"></i> LOGOUT';
+            mobileLogout.style.cssText = 'width:100%; padding:15px; background:#ff4757; color:white; border:none; border-radius:8px; font-size:16px; font-weight:bold; margin-top:10px; cursor:pointer;';
+            mobileLogout.addEventListener('click', function(e) {
                 e.preventDefault();
-                e.stopPropagation();
-                if (confirm('Apakah Anda yakin ingin logout?')) {
-                    // Hapus semua data session
-                    sessionStorage.clear();
-                    localStorage.removeItem('userData');
-                    
-                    // Redirect ke halaman utama
-                    window.location.href = 'index.html';
-                }
+                logoutUser();
             });
             
-            // Tambahkan setelah date picker
-            const datePicker = document.querySelector('.date-picker');
-            if (datePicker) {
-                datePicker.parentNode.insertBefore(logoutMobileBtn, datePicker.nextSibling);
-            } else {
-                dashboardNav.appendChild(logoutMobileBtn);
-            }
-        }
-    }
-    
-    // Tambahkan menu mobile jika belum ada
-    let navMenu = document.querySelector('.nav-menu');
-    if (!navMenu) {
-        // Buat menu mobile
-        navMenu = document.createElement('nav');
-        navMenu.className = 'nav-menu';
-        navMenu.innerHTML = `
-            <ul>
-                <li><a href="index.html"><i class="fas fa-home"></i> Beranda</a></li>
-                <li><a href="dashboard-user.html"><i class="fas fa-pen"></i> Jurnal</a></li>
-                <li><a href="index.html#materi"><i class="fas fa-book-open"></i> Materi</a></li>
-                <li><a href="index.html#ayat"><i class="fas fa-quran"></i> Ayat & Hadis</a></li>
-                <li><a href="index.html#doa"><i class="fas fa-pray"></i> Doa & Niat</a></li>
-                <li><a href="index.html#tips"><i class="fas fa-lightbulb"></i> Tips Ramadhan</a></li>
-            </ul>
-        `;
-        document.body.appendChild(navMenu);
-    }
-    
-    // Tambahkan user info di menu
-    const userName = sessionStorage.getItem('userNama') || 'User';
-    const userInfo = document.createElement('div');
-    userInfo.className = 'menu-user-info';
-    userInfo.innerHTML = `
-        <i class="fas fa-user-circle"></i>
-        <h4>${userName}</h4>
-        <p>Jurnal Ramadhan 1447 H</p>
-    `;
-    navMenu.insertBefore(userInfo, navMenu.firstChild);
-    
-    // Tambahkan tombol close
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'mobile-menu-close';
-    closeBtn.innerHTML = '<i class="fas fa-times"></i> Tutup';
-    closeBtn.addEventListener('click', toggleMobileMenu);
-    navMenu.appendChild(closeBtn);
-    
-    // Tambahkan tombol logout di menu
-    const logoutMenuBtn = document.createElement('button');
-    logoutMenuBtn.className = 'mobile-logout-btn';
-    logoutMenuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-    logoutMenuBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (confirm('Apakah Anda yakin ingin logout?')) {
-            sessionStorage.clear();
-            localStorage.removeItem('userData');
-            window.location.href = 'index.html';
-        }
-    });
-    navMenu.appendChild(logoutMenuBtn);
-    
-    // Buat overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'menu-overlay';
-    overlay.addEventListener('click', toggleMobileMenu);
-    document.body.appendChild(overlay);
-});
-
-// Fungsi toggle mobile menu
-window.toggleMobileMenu = function() {
-    const navMenu = document.querySelector('.nav-menu');
-    const overlay = document.querySelector('.menu-overlay');
-    const body = document.body;
-    const toggleIcon = document.querySelector('.mobile-menu-toggle i');
-    
-    if (navMenu && overlay) {
-        navMenu.classList.toggle('active');
-        overlay.classList.toggle('active');
-        body.classList.toggle('menu-open');
-        
-        // Ubah icon menu
-        if (toggleIcon) {
-            if (navMenu.classList.contains('active')) {
-                toggleIcon.classList.remove('fa-bars');
-                toggleIcon.classList.add('fa-times');
-            } else {
-                toggleIcon.classList.remove('fa-times');
-                toggleIcon.classList.add('fa-bars');
-            }
-        }
-    }
-};
-
-// Tutup menu dengan tombol Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const navMenu = document.querySelector('.nav-menu');
-        if (navMenu && navMenu.classList.contains('active')) {
-            toggleMobileMenu();
+            // Taruh di akhir container
+            container.appendChild(mobileLogout);
         }
     }
 });
 
-// Tambahkan tombol mobile menu toggle jika belum ada
+// Fungsi untuk toggle menu (sederhana)
+function toggleMenu() {
+    const menu = document.querySelector('.nav-menu');
+    if (menu) {
+        if (menu.style.display === 'block') {
+            menu.style.display = 'none';
+        } else {
+            menu.style.display = 'block';
+        }
+    }
+}
+</script>
+
+<!-- CSS MOBILE SEDERHANA -->
+<style>
+/* CSS untuk mobile */
+@media screen and (max-width: 768px) {
+    /* Tombol logout merah */
+    .btn-logout-mobile {
+        display: block !important;
+        width: 100%;
+        padding: 15px;
+        background: #ff4757;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        margin: 10px 0;
+        cursor: pointer;
+        text-align: center;
+    }
+    
+    .btn-logout-mobile:active {
+        background: #ff6b81;
+    }
+    
+    /* Sembunyikan tombol logout desktop */
+    .btn-logout {
+        display: none !important;
+    }
+    
+    /* Menu mobile sederhana */
+    .nav-menu {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 80%;
+        height: 100%;
+        background: #1e3c72;
+        padding: 20px;
+        z-index: 9999;
+    }
+    
+    .nav-menu ul {
+        list-style: none;
+        padding: 0;
+        margin-top: 50px;
+    }
+    
+    .nav-menu li {
+        margin: 15px 0;
+    }
+    
+    .nav-menu a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        display: block;
+        padding: 10px;
+    }
+    
+    /* Tombol toggle menu */
+    .mobile-menu-toggle {
+        display: block;
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+    }
+}
+
+/* Desktop */
+@media screen and (min-width: 769px) {
+    .btn-logout-mobile {
+        display: none !important;
+    }
+    .btn-logout {
+        display: inline-flex !important;
+    }
+}
+</style>
+
+<!-- TAMBAHKAN TOMBOL TOGGLE DI HEADER -->
+<script>
+// Tambahkan tombol menu toggle di header
 document.addEventListener('DOMContentLoaded', function() {
     const navBrand = document.querySelector('.nav-brand');
     if (navBrand && !document.querySelector('.mobile-menu-toggle')) {
         const toggleBtn = document.createElement('button');
         toggleBtn.className = 'mobile-menu-toggle';
-        toggleBtn.setAttribute('aria-label', 'Menu');
-        toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        toggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMobileMenu();
-        });
+        toggleBtn.innerHTML = '☰';
+        toggleBtn.onclick = toggleMenu;
         navBrand.appendChild(toggleBtn);
     }
 });
@@ -847,6 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
+
 
 
 
