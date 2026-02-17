@@ -388,370 +388,279 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js"></script>
     <script src="js/user-dashboard.js"></script>
-<!-- Tambahkan script untuk perbaikan mobile -->
+<!-- Tambahkan script ini di user-dashboard.html sebelum </body> -->
 <script>
-// Perbaikan untuk tampilan mobile - tombol logout selalu terlihat
+// Perbaikan untuk navigasi di dashboard user
 document.addEventListener('DOMContentLoaded', function() {
-    const style = document.createElement('style');
-    style.textContent = `
-        /* ===== PERBAIKAN MOBILE USER DASHBOARD ===== */
-        
-        /* Tombol logout mobile yang fixed */
-        @media screen and (max-width: 768px) {
-            /* Perbaikan header mobile */
-            .dashboard-nav {
-                padding: 10px 0;
-            }
-            
-            .dashboard-nav .container {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-                position: relative;
-            }
-            
-            .nav-brand {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                padding-right: 50px; /* Ruang untuk tombol menu */
-            }
-            
-            .nav-brand h2 {
-                font-size: 1.1rem;
-                margin: 0;
-            }
-            
-            .nav-brand p {
-                font-size: 0.7rem;
-                margin: 0;
-            }
-            
-            /* Tombol logout mobile - selalu terlihat */
-            .btn-logout-mobile {
-                display: block;
-                width: 100%;
-                padding: 12px;
-                background: #ff4757;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                text-align: center;
-                margin: 5px 0;
-                transition: background 0.3s;
-                -webkit-tap-highlight-color: transparent;
-            }
-            
-            .btn-logout-mobile:active {
-                background: #ff6b81;
-                transform: scale(0.98);
-            }
-            
-            /* Tombol logout di menu mobile */
-            .mobile-logout-btn {
-                display: block;
-                width: 100%;
-                padding: 15px;
-                background: #ff4757;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                font-size: 1.1rem;
-                font-weight: 600;
-                cursor: pointer;
-                text-align: center;
-                margin-top: 15px;
-                transition: background 0.3s;
-            }
-            
-            .mobile-logout-btn i {
-                margin-right: 8px;
-            }
-            
-            /* Sembunyikan tombol logout desktop di mobile */
-            .btn-logout {
-                display: none !important;
-            }
-            
-            /* Perbaikan menu mobile */
-            .nav-menu {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(135deg, #1e3c72, #2a5298);
-                transform: translateX(100%);
-                transition: transform 0.3s ease;
-                z-index: 2000;
-                padding: 80px 20px 20px;
-                overflow-y: auto;
-            }
-            
-            .nav-menu.active {
-                transform: translateX(0);
-            }
-            
-            .nav-menu ul {
-                flex-direction: column;
-                padding: 0;
-                margin: 0;
-            }
-            
-            .nav-menu li {
-                margin: 10px 0;
-                list-style: none;
-            }
-            
-            .nav-menu a {
-                display: block;
-                padding: 15px;
-                background: rgba(255,255,255,0.1);
-                border-radius: 8px;
-                color: white;
-                text-decoration: none;
-                font-size: 1.1rem;
-                text-align: center;
-            }
-            
-            .nav-menu a i {
-                margin-right: 10px;
-                width: 20px;
-            }
-            
-            /* Tombol close menu */
-            .mobile-menu-close {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                background: transparent;
-                border: none;
-                color: white;
-                font-size: 1.8rem;
-                cursor: pointer;
-                z-index: 2001;
-                padding: 10px;
-            }
-            
-            /* Tombol menu toggle */
-            .mobile-menu-toggle {
-                display: block;
-                background: transparent;
-                border: none;
-                color: white;
-                font-size: 1.5rem;
-                cursor: pointer;
-                padding: 10px;
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-            
-            /* Overlay saat menu terbuka */
-            .menu-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0,0,0,0.5);
-                z-index: 1999;
-                backdrop-filter: blur(3px);
-            }
-            
-            .menu-overlay.active {
-                display: block;
-            }
-            
-            /* Prevent body scroll saat menu terbuka */
-            body.menu-open {
-                overflow: hidden;
-            }
-            
-            /* Date picker mobile */
-            .date-picker {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                background: rgba(255,255,255,0.1);
-                padding: 8px 12px;
-                border-radius: 8px;
-                margin: 5px 0;
-            }
-            
-            .date-picker label {
-                color: white;
-                font-size: 0.9rem;
-                white-space: nowrap;
-            }
-            
-            .date-picker input {
-                flex: 1;
-                padding: 10px;
-                border: none;
-                border-radius: 5px;
-                font-size: 1rem;
-            }
-        }
-        
-        /* Desktop styles */
-        @media screen and (min-width: 769px) {
-            .btn-logout-mobile,
-            .mobile-logout-btn,
-            .mobile-menu-close,
-            .menu-overlay {
-                display: none !important;
-            }
-            
-            .btn-logout {
-                display: flex !important;
-            }
-        }
-        
-        /* Animasi */
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-            }
-            to {
-                transform: translateX(0);
-            }
-        }
-        
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-            }
-            to {
-                transform: translateX(100%);
-            }
-        }
-    `;
+    const dashboardNav = document.querySelector('.dashboard-nav');
+    const navLinks = document.querySelectorAll('.dashboard-nav a, .sidebar-nav a');
+    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     
-    document.head.appendChild(style);
+    // Hide header on scroll down, show on scroll up
+    let lastScrollTop = 0;
     
-    // Tambahkan tombol logout mobile ke DOM
-    const dashboardNav = document.querySelector('.dashboard-nav .container');
-    if (dashboardNav) {
-        // Cek apakah sudah ada tombol logout mobile
-        if (!document.querySelector('.btn-logout-mobile')) {
-            // Buat tombol logout mobile
-            const logoutMobileBtn = document.createElement('button');
-            logoutMobileBtn.className = 'btn-logout-mobile';
-            logoutMobileBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-            logoutMobileBtn.onclick = function() {
-                if (confirm('Yakin ingin logout?')) {
-                    logout();
-                }
-            };
-            
-            // Tambahkan setelah date picker
-            const datePicker = document.querySelector('.date-picker');
-            if (datePicker) {
-                datePicker.parentNode.insertBefore(logoutMobileBtn, datePicker.nextSibling);
+    window.addEventListener('scroll', function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (dashboardNav) {
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scrolling down
+                dashboardNav.classList.add('hide');
             } else {
-                dashboardNav.appendChild(logoutMobileBtn);
+                // Scrolling up
+                dashboardNav.classList.remove('hide');
             }
         }
-    }
-    
-    // Tambahkan tombol logout di menu mobile
-    const navMenu = document.querySelector('.nav-menu');
-    if (navMenu) {
-        // Buat tombol close
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'mobile-menu-close';
-        closeBtn.innerHTML = '<i class="fas fa-times"></i>';
-        closeBtn.onclick = toggleMobileMenu;
-        navMenu.appendChild(closeBtn);
         
-        // Buat tombol logout di menu
-        const logoutMenuBtn = document.createElement('button');
-        logoutMenuBtn.className = 'mobile-logout-btn';
-        logoutMenuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-        logoutMenuBtn.onclick = function() {
-            if (confirm('Yakin ingin logout?')) {
-                logout();
+        lastScrollTop = scrollTop;
+    }, { passive: true });
+    
+    // Smooth scroll to sections
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                const targetId = href.substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    const headerHeight = dashboardNav ? dashboardNav.offsetHeight : 0;
+                    
+                    window.scrollTo({
+                        top: targetElement.offsetTop - headerHeight - 20,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    const navMenu = document.querySelector('.nav-menu');
+                    if (navMenu && navMenu.classList.contains('active')) {
+                        navMenu.classList.remove('active');
+                        document.body.classList.remove('menu-open');
+                    }
+                }
             }
-        };
-        
-        // Tambahkan di akhir menu
-        navMenu.appendChild(logoutMenuBtn);
+        });
+    });
+    
+    // Handle mobile menu toggle
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', function() {
+            const navMenu = document.querySelector('.nav-menu');
+            if (navMenu) {
+                navMenu.classList.toggle('active');
+                document.body.classList.toggle('menu-open');
+                
+                const icon = this.querySelector('i');
+                if (icon) {
+                    if (icon.classList.contains('fa-bars')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                }
+            }
+        });
     }
     
-    // Buat overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'menu-overlay';
-    overlay.onclick = toggleMobileMenu;
-    document.body.appendChild(overlay);
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const navMenu = document.querySelector('.nav-menu');
+            if (navMenu && navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                document.body.classList.remove('menu-open');
+                
+                const icon = document.querySelector('.mobile-menu-toggle i');
+                if (icon) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            }
+        }
+    });
 });
 
-// Override fungsi toggleMobileMenu
-window.toggleMobileMenu = function() {
+// Fungsi untuk toggle mobile menu (untuk dipanggil dari HTML)
+function toggleMobileMenu() {
     const navMenu = document.querySelector('.nav-menu');
-    const overlay = document.querySelector('.menu-overlay');
     const body = document.body;
-    const toggleIcon = document.querySelector('.mobile-menu-toggle i');
     
     if (navMenu) {
         navMenu.classList.toggle('active');
-        overlay.classList.toggle('active');
         body.classList.toggle('menu-open');
         
-        // Ubah icon menu
-        if (toggleIcon) {
-            if (navMenu.classList.contains('active')) {
-                toggleIcon.classList.remove('fa-bars');
-                toggleIcon.classList.add('fa-times');
+        const icon = document.querySelector('.mobile-menu-toggle i');
+        if (icon) {
+            if (icon.classList.contains('fa-bars')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
             } else {
-                toggleIcon.classList.remove('fa-times');
-                toggleIcon.classList.add('fa-bars');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
             }
         }
     }
-};
+}
 
-// Tutup menu dengan tombol Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const navMenu = document.querySelector('.nav-menu');
-        if (navMenu && navMenu.classList.contains('active')) {
-            toggleMobileMenu();
+// Close menu when clicking outside
+document.addEventListener('click', function(event) {
+    const navMenu = document.querySelector('.nav-menu');
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    
+    if (!navMenu || !toggle) return;
+    
+    if (!navMenu.contains(event.target) && !toggle.contains(event.target)) {
+        if (navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            
+            const icon = toggle.querySelector('i');
+            if (icon) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
         }
     }
 });
-
-// Pastikan fungsi logout tersedia
-window.logout = function() {
-    sessionStorage.clear();
-    window.location.href = 'index.html';
-};
 </script>
 
-<!-- Tambahkan tombol mobile menu toggle jika belum ada -->
-<script>
-// Tambahkan tombol mobile menu toggle jika belum ada
-document.addEventListener('DOMContentLoaded', function() {
-    const navBrand = document.querySelector('.nav-brand');
-    if (navBrand && !document.querySelector('.mobile-menu-toggle')) {
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'mobile-menu-toggle';
-        toggleBtn.setAttribute('aria-label', 'Menu');
-        toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        toggleBtn.onclick = toggleMobileMenu;
-        navBrand.appendChild(toggleBtn);
+<!-- Tambahkan CSS untuk perbaikan -->
+<style>
+/* Perbaikan untuk dashboard nav */
+.dashboard-nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.dashboard-nav.hide {
+    transform: translateY(-100%);
+}
+
+/* Perbaikan untuk scroll padding */
+html {
+    scroll-padding-top: 80px;
+    scroll-behavior: smooth;
+}
+
+/* Perbaikan untuk section scroll */
+section, .form-section, .card {
+    scroll-margin-top: 90px;
+}
+
+/* Perbaikan untuk mobile menu */
+@media screen and (max-width: 768px) {
+    .dashboard-nav .container {
+        flex-wrap: wrap;
     }
-});
-</script>
+    
+    .nav-menu {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        padding: 20px;
+        transform: translateY(-150%);
+        transition: transform 0.3s ease;
+        z-index: 999;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        max-height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+    
+    .nav-menu.active {
+        transform: translateY(0);
+    }
+    
+    .nav-menu ul {
+        flex-direction: column;
+    }
+    
+    .nav-menu li {
+        margin: 10px 0;
+    }
+    
+    .nav-menu a {
+        display: block;
+        padding: 15px;
+        text-align: center;
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        font-size: 1.1rem;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .mobile-menu-toggle {
+        display: block;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 10px;
+    }
+    
+    /* Prevent body scroll when menu open */
+    body.menu-open {
+        overflow: hidden;
+    }
+    
+    /* Adjust main content when menu open */
+    body.menu-open .dashboard-main {
+        filter: blur(2px);
+        transition: filter 0.3s ease;
+    }
+}
+
+/* Hide mobile toggle on desktop */
+@media screen and (min-width: 769px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+}
+
+/* Smooth transitions */
+.dashboard-main {
+    transition: filter 0.3s ease;
+}
+
+/* Better touch targets */
+.nav-menu a {
+    -webkit-tap-highlight-color: rgba(255,215,0,0.3);
+}
+
+/* Loading indicator for navigation */
+.nav-link-loading {
+    position: relative;
+}
+
+.nav-link-loading::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ffd700;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: translateY(-50%) rotate(360deg); }
+}
+</style>
 </body>
 
 </html>
+
 
