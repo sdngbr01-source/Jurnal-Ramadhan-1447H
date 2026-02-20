@@ -186,84 +186,195 @@
                         <h3><i class="fas fa-database"></i> Management Data Jurnal</h3>
                     </div>
 
-                    <div class="filter-bar">
-                        <div class="filter-group">
-                            <select id="sortData" class="form-control">
-                                <option value="tertinggi">Skor Tertinggi</option>
-                                <option value="terendah">Skor Terendah</option>
-                                <option value="az">A-Z (Nama)</option>
-                                <option value="za">Z-A (Nama)</option>
-                            </select>
-                            <select id="filterKelasData" class="form-control">
-                                <option value="">Semua Kelas</option>
-                                <option value="1A">Kelas 1A</option>
-                                <option value="1B">Kelas 1B</option>
-                                <option value="2A">Kelas 2A</option>
-                                <option value="2B">Kelas 2B</option>
-                                <option value="3A">Kelas 3A</option>
-                                <option value="3B">Kelas 3B</option>
-                                <option value="4A">Kelas 4A</option>
-                                <option value="4B">Kelas 4B</option>
-                                <option value="5A">Kelas 5A</option>
-                                <option value="5B">Kelas 5B</option>
-                                <option value="6A">Kelas 6A</option>
-                                <option value="6B">Kelas 6B</option>
-                            </select>
-                            <input type="text" id="searchNama" placeholder="Cari nama..." class="form-control">
-                            <input type="date" id="filterTanggal" class="form-control">
-                            <button class="btn-primary" onclick="loadDataTable()">
-                                <i class="fas fa-search"></i> Cari
-                            </button>
-                        </div>
-                    </div>
+<div class="filter-bar">
+    <div class="filter-group" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <!-- Mode Toggle -->
+        <div class="mode-toggle" style="display: flex; gap: 5px; margin-right: 15px; background: #f0f4f8; padding: 5px; border-radius: 30px;">
+            <button type="button" id="modeDetail" class="btn-mode active" onclick="setViewMode('detail')" style="padding: 8px 15px; border: none; border-radius: 25px; cursor: pointer; background: #1e3c72; color: white;">
+                <i class="fas fa-table"></i> Detail Jurnal
+            </button>
+            <button type="button" id="modeKumulatif" class="btn-mode" onclick="setViewMode('kumulatif')" style="padding: 8px 15px; border: none; border-radius: 25px; cursor: pointer; background: transparent; color: #666;">
+                <i class="fas fa-chart-line"></i> Rekap Kumulatif
+            </button>
+        </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th rowspan="2">No</th>
-                                    <th rowspan="2">Tanggal</th>
-                                    <th rowspan="2">Nama</th>
-                                    <th rowspan="2">Kelas</th>
-                                    <th colspan="2">Puasa</th>
-                                    <th colspan="3">Subuh</th>
-                                    <th colspan="3">Dzuhur</th>
-                                    <th colspan="3">Ashar</th>
-                                    <th colspan="3">Magrib</th>
-                                    <th colspan="3">Isya</th>
-                                    <th rowspan="2">Tarawih</th>
-                                    <th rowspan="2">Tadarus</th>
-                                    <th rowspan="2">Jumat</th>
-                                    <th rowspan="2">Infaq</th>
-                                    <th rowspan="2">Total Skor</th>
-                                </tr>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Skor</th>
-                                    <th>Status</th>
-                                    <th>Jam</th>
-                                    <th>Skor</th>
-                                    <th>Status</th>
-                                    <th>Jam</th>
-                                    <th>Skor</th>
-                                    <th>Status</th>
-                                    <th>Jam</th>
-                                    <th>Skor</th>
-                                    <th>Status</th>
-                                    <th>Jam</th>
-                                    <th>Skor</th>
-                                    <th>Status</th>
-                                    <th>Jam</th>
-                                    <th>Skor</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dataTableBody">
-                                <tr>
-                                    <td colspan="26" style="text-align: center;">Loading data...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <!-- Filter untuk Detail Jurnal -->
+        <div id="detailFilters" style="display: flex; flex-wrap: wrap; gap: 10px; flex: 1;">
+            <select id="filterKelasDetail" class="form-control" style="width: 130px;">
+                <option value="">Semua Kelas</option>
+                <option value="1A">Kelas 1A</option>
+                <option value="1B">Kelas 1B</option>
+                <option value="2A">Kelas 2A</option>
+                <option value="2B">Kelas 2B</option>
+                <option value="3A">Kelas 3A</option>
+                <option value="3B">Kelas 3B</option>
+                <option value="4A">Kelas 4A</option>
+                <option value="4B">Kelas 4B</option>
+                <option value="5A">Kelas 5A</option>
+                <option value="5B">Kelas 5B</option>
+                <option value="6A">Kelas 6A</option>
+                <option value="6B">Kelas 6B</option>
+            </select>
+            
+            <input type="text" id="searchNamaDetail" placeholder="Cari nama..." class="form-control" style="width: 200px;">
+            
+            <select id="sortDetail" class="form-control" style="width: 150px;">
+                <option value="terbaru">Terbaru</option>
+                <option value="terlama">Terlama</option>
+                <option value="skorTertinggi">Skor Tertinggi</option>
+                <option value="skorTerendah">Skor Terendah</option>
+                <option value="az">A-Z (Nama)</option>
+                <option value="za">Z-A (Nama)</option>
+            </select>
+            
+            <button class="btn-primary" onclick="applyDetailFilters()">
+                <i class="fas fa-search"></i> Cari
+            </button>
+            <button class="btn-secondary" onclick="resetDetailFilters()" title="Reset Filter">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
+
+        <!-- Filter untuk Kumulatif -->
+        <div id="kumulatifFilters" style="display: none; flex-wrap: wrap; gap: 10px; flex: 1;">
+            <select id="filterKelasKumulatif" class="form-control" style="width: 130px;">
+                <option value="">Semua Kelas</option>
+                <option value="1A">Kelas 1A</option>
+                <option value="1B">Kelas 1B</option>
+                <option value="2A">Kelas 2A</option>
+                <option value="2B">Kelas 2B</option>
+                <option value="3A">Kelas 3A</option>
+                <option value="3B">Kelas 3B</option>
+                <option value="4A">Kelas 4A</option>
+                <option value="4B">Kelas 4B</option>
+                <option value="5A">Kelas 5A</option>
+                <option value="5B">Kelas 5B</option>
+                <option value="6A">Kelas 6A</option>
+                <option value="6B">Kelas 6B</option>
+            </select>
+            
+            <input type="text" id="searchNamaKumulatif" placeholder="Cari nama..." class="form-control" style="width: 200px;">
+            
+            <select id="sortKumulatif" class="form-control" style="width: 180px;">
+                <option value="total-desc">Total Tertinggi</option>
+                <option value="total-asc">Total Terendah</option>
+                <option value="nama-asc">Nama A-Z</option>
+                <option value="nama-desc">Nama Z-A</option>
+            </select>
+            
+            <button class="btn-primary" onclick="applyKumulatifFilters()">
+                <i class="fas fa-search"></i> Cari
+            </button>
+            <button class="btn-secondary" onclick="resetKumulatifFilters()" title="Reset Filter">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+            
+            <button class="btn-success" onclick="exportKumulatifToExcel()" style="margin-left: auto;">
+                <i class="fas fa-file-excel"></i> Export Excel
+            </button>
+        </div>
+    </div>
+</div>
+<!-- Container untuk Tabel Dinamis -->
+<div id="tableContainer">
+    <!-- Tabel Detail Jurnal (Default) -->
+    <div id="detailTableContainer">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th rowspan="2">No</th>
+                        <th rowspan="2">Tanggal</th>
+                        <th rowspan="2">Nama</th>
+                        <th rowspan="2">Kelas</th>
+                        <th colspan="2">Puasa</th>
+                        <th colspan="3">Subuh</th>
+                        <th colspan="3">Dzuhur</th>
+                        <th colspan="3">Ashar</th>
+                        <th colspan="3">Magrib</th>
+                        <th colspan="3">Isya</th>
+                        <th rowspan="2">Tarawih</th>
+                        <th rowspan="2">Tadarus</th>
+                        <th rowspan="2">Jumat</th>
+                        <th rowspan="2">Infaq</th>
+                        <th rowspan="2">Total Skor</th>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <th>Skor</th>
+                        <th>Status</th>
+                        <th>Jam</th>
+                        <th>Skor</th>
+                        <th>Status</th>
+                        <th>Jam</th>
+                        <th>Skor</th>
+                        <th>Status</th>
+                        <th>Jam</th>
+                        <th>Skor</th>
+                        <th>Status</th>
+                        <th>Jam</th>
+                        <th>Skor</th>
+                        <th>Status</th>
+                        <th>Jam</th>
+                        <th>Skor</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    <tr><td colspan="26" style="text-align: center;">Loading data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<!-- Tabel Kumulatif -->
+<div id="kumulatifTableContainer" style="display: none;">
+    <div class="table-responsive">
+        <table class="table table-bordered" style="font-size: 14px; width: 100%;">
+            <thead>
+                <tr style="background: linear-gradient(135deg, #1e3c72, #2a5298); color: white;">
+                    <th rowspan="2">No</th>
+                    <th rowspan="2">Nama</th>
+                    <th rowspan="2">Kelas</th>
+                    <th colspan="2">Puasa</th>
+                    <th colspan="2">Sholat Wajib</th>
+                    <th rowspan="2">Tarawih</th>
+                    <th rowspan="2">Tadarus</th>
+                    <th rowspan="2">Infaq</th>
+                    <th rowspan="2">Jum'at</th>
+                    <th rowspan="2">Idul Fitri</th>
+                    <th rowspan="2">Total<br>Kumulatif</th>
+                    <th rowspan="2">Jumlah<br>Hari</th>
+                </tr>
+                <tr style="background: linear-gradient(135deg, #2a5298, #1e3c72); color: white;">
+                    <th>Total</th>
+                    <th>Rata²</th>
+                    <th>Total</th>
+                    <th>Rata²</th>
+                </tr>
+            </thead>
+            <tbody id="kumulatifTableBody">
+                <tr><td colspan="14" style="text-align: center;">Loading data...</td></tr>
+            </tbody>
+            <tfoot id="kumulatifTableFooter" style="background: #f0f4f8; font-weight: bold;">
+                <tr>
+                    <td colspan="3" style="text-align: right;"><strong>Total Keseluruhan:</strong></td>
+                    <td id="totalPuasaAll">0</td>
+                    <td>-</td>
+                    <td id="totalSholatAll">0</td>
+                    <td>-</td>
+                    <td id="totalTarawihAll">0</td>
+                    <td id="totalTadarusAll">0</td>
+                    <td id="totalInfaqAll">0</td>
+                    <td id="totalJumatAll">0</td>
+                    <td id="totalIdulFitriAll">0</td>
+                    <td id="totalKumulatifAll">0</td>
+                    <td id="totalHariAll">0</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+</div>
                 </section>
 
                 <!-- EXPORT SECTION -->
