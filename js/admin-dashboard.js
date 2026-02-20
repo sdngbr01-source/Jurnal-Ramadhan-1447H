@@ -1,12 +1,20 @@
-// Admin Dashboard JavaScript - VERSI FINAL
+// Admin Dashboard JavaScript - VERSI FINAL FIX
 
-// Global variables
+// ===== GLOBAL VARIABLES =====
 let currentAdmin = '';
 let charts = {};
+let currentViewMode = 'detail';
+let appData = {
+    users: [],
+    jurnals: [],
+    userMap: {},
+    lastLoad: 0
+};
+const CACHE_DURATION = 300000; // 5 menit
 
-// Initialize on page load
+// ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('Admin dashboard loaded');
+    console.log('Admin dashboard initialized');
     
     // Check if admin is logged in
     currentAdmin = sessionStorage.getItem('adminUsername');
@@ -24,15 +32,25 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Tambahkan tombol Test Connection
     addTestConnectionButton();
     
-    // Load initial data
+    // Load all data
+    await loadAllData();
+    
+    // Load dashboard data
     await loadDashboardData();
+    
+    // Load users
     await loadUsers();
+    
+    // Set initial mode untuk management data
+    if (document.getElementById('modeDetail')) {
+        setViewMode('detail');
+    }
     
     // Setup event listeners
     setupEventListeners();
 });
 
-// Tambah tombol test connection
+// ===== HELPER FUNCTIONS =====
 function addTestConnectionButton() {
     const adminInfo = document.querySelector('.admin-info');
     if (adminInfo) {
@@ -45,41 +63,63 @@ function addTestConnectionButton() {
     }
 }
 
-// Setup all event listeners
+// ===== LOAD ALL DATA (CACHE) =====
+async function loadAllData(force = false) {
+    const now = Date.now();
+    
+    // Gunakan cache jika masih valid
+    if (!force && appData.lastLoad > 0 && (now - appData.lastLoad) < CACHE_DURATION) {
+        console.log('Using cached data');
+        return;
+    }
+    
+    try {
+        showAlert('Memuat data...', 'info');
+        
+        // Load users dan jurnal parallel
+        const [usersSnap, jurnalsSnap] = await Promise.all([
+            usersCollection.get(),
+            jurnalCollection.get()
+        ]);
+        
+        // Simpan users
+        appData.users = [];
+        appData.userMap = {};
+        usersSnap.forEach(doc => {
+            const user = { id: doc.id, ...doc.data() };
+            appData.users.push(user);
+            appData.userMap[doc.id] = user;
+        });
+        
+        // Simpan jurnals
+        appData.jurnals = [];
+        jurnalsSnap.forEach(doc => {
+            appData.jurnals.push({ id: doc.id, ...doc.data() });
+        });
+        
+        appData.lastLoad = Date.now();
+        
+        console.log(`Data loaded: ${appData.users.length} users, ${appData.jurnals.length} jurnals`);
+        showAlert('Data berhasil dimuat', 'success');
+        
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showAlert('Gagal memuat data: ' + error.message, 'error');
+    }
+}
+
+// ===== SETUP EVENT LISTENERS =====
 function setupEventListeners() {
-    // Search user
+    // Search user di management user
     const searchUser = document.getElementById('searchUser');
     if (searchUser) {
         searchUser.addEventListener('input', debounce(loadUsers, 500));
     }
     
-    // Filter kelas
+    // Filter kelas di management user
     const filterKelas = document.getElementById('filterKelas');
     if (filterKelas) {
         filterKelas.addEventListener('change', loadUsers);
-    }
-    
-    const filterKelasData = document.getElementById('filterKelasData');
-    if (filterKelasData) {
-        filterKelasData.addEventListener('change', loadDataTable);
-    }
-    
-    // Sort data
-    const sortData = document.getElementById('sortData');
-    if (sortData) {
-        sortData.addEventListener('change', loadDataTable);
-    }
-    
-    // Search nama
-    const searchNama = document.getElementById('searchNama');
-    if (searchNama) {
-        searchNama.addEventListener('input', debounce(loadDataTable, 500));
-    }
-    
-    // Filter tanggal
-    const filterTanggal = document.getElementById('filterTanggal');
-    if (filterTanggal) {
-        filterTanggal.addEventListener('change', loadDataTable);
     }
     
     // File upload preview
@@ -87,9 +127,53 @@ function setupEventListeners() {
     if (excelFile) {
         excelFile.addEventListener('change', previewExcel);
     }
+    
+    // Enter key untuk search di detail
+    const searchNamaDetail = document.getElementById('searchNamaDetail');
+    if (searchNamaDetail) {
+        searchNamaDetail.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') applyDetailFilters();
+        });
+    }
+    
+    // Enter key untuk search di kumulatif
+    const searchNamaKumulatif = document.getElementById('searchNamaKumulatif');
+    if (searchNamaKumulatif) {
+        searchNamaKumulatif.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') applyKumulatifFilters();
+        });
+    }
+    
+    // Change events untuk filter detail
+    const filterKelasDetail = document.getElementById('filterKelasDetail');
+    if (filterKelasDetail) {
+        filterKelasDetail.addEventListener('change', applyDetailFilters);
+    }
+    
+    const sortDetail = document.getElementById('sortDetail');
+    if (sortDetail) {
+        sortDetail.addEventListener('change', applyDetailFilters);
+    }
+    
+    // Change events untuk filter kumulatif
+    const filterKelasKumulatif = document.getElementById('filterKelasKumulatif');
+    if (filterKelasKumulatif) {
+        filterKelasKumulatif.addEventListener('change', applyKumulatifFilters);
+    }
+    
+    const sortKumulatif = document.getElementById('sortKumulatif');
+    if (sortKumulatif) {
+        sortKumulatif.addEventListener('change', applyKumulatifFilters);
+    }
+    
+    // Search di kumulatif dengan debounce
+    const searchKumulatif = document.getElementById('searchKumulatif');
+    if (searchKumulatif) {
+        searchKumulatif.addEventListener('keyup', debounce(applyKumulatifFilters, 500));
+    }
 }
 
-// Show section function
+// ===== SHOW SECTION =====
 window.showSection = function(section) {
     // Update active class in sidebar
     document.querySelectorAll('.sidebar-nav li').forEach(li => {
@@ -127,9 +211,16 @@ window.showSection = function(section) {
     
     // Load data if needed
     if (section === 'data') {
-        loadDataTable();
+        // Pastikan mode yang aktif sesuai
+        if (currentViewMode === 'detail') {
+            applyDetailFilters();
+        } else {
+            applyKumulatifFilters();
+        }
     } else if (section === 'users') {
         loadUsers();
+    } else if (section === 'dashboard') {
+        loadDashboardData();
     }
 };
 
@@ -139,19 +230,17 @@ async function loadDashboardData() {
         console.log('Loading dashboard data...');
         
         // Get total users
-        const usersSnapshot = await usersCollection.get();
         const totalUsers = document.getElementById('totalUsers');
-        if (totalUsers) totalUsers.textContent = usersSnapshot.size;
+        if (totalUsers) totalUsers.textContent = appData.users.length;
         
-        // Get total admins
+        // Get total admins (masih perlu query terpisah)
         const adminsSnapshot = await adminCollection.get();
         const totalAdmins = document.getElementById('totalAdmins');
         if (totalAdmins) totalAdmins.textContent = adminsSnapshot.size;
         
         // Get total jurnal
-        const jurnalSnapshot = await jurnalCollection.get();
         const totalJurnal = document.getElementById('totalJurnal');
-        if (totalJurnal) totalJurnal.textContent = jurnalSnapshot.size;
+        if (totalJurnal) totalJurnal.textContent = appData.jurnals.length;
         
         // Calculate scores
         let totalScore = 0;
@@ -162,16 +251,15 @@ async function loadDashboardData() {
         let skorJumat = 0;
         let skorInfaq = 0;
         
-        jurnalSnapshot.forEach(doc => {
-            const data = doc.data();
-            totalScore += data.totalScore || 0;
+        appData.jurnals.forEach(jurnal => {
+            totalScore += jurnal.totalScore || 0;
             
             // Puasa
-            if (data.puasa?.status === 'ya') skorPuasa += 1;
+            if (jurnal.puasa?.status === 'ya') skorPuasa += 1;
             
             // Shalat wajib
-            if (data.shalat) {
-                Object.values(data.shalat).forEach(shalat => {
+            if (jurnal.shalat) {
+                Object.values(jurnal.shalat).forEach(shalat => {
                     if (shalat?.status === 'ya') {
                         skorSholatWajib += shalat.jamaah === 'berjamaah' ? 2 : 1;
                     }
@@ -179,16 +267,16 @@ async function loadDashboardData() {
             }
             
             // Tarawih
-            if (data.tarawih?.status === 'ya') skorTarawih += 1;
+            if (jurnal.tarawih?.status === 'ya') skorTarawih += 1;
             
             // Tadarus
-            if (data.tadarus?.status === 'ya') skorTadarus += 1;
+            if (jurnal.tadarus?.status === 'ya') skorTadarus += 1;
             
             // Jumat
-            if (data.shalat_jumat?.status === 'ya') skorJumat += 1;
+            if (jurnal.shalat_jumat?.status === 'ya') skorJumat += 1;
             
             // Infaq
-            if (data.infaq === 'ya') skorInfaq += 1;
+            if (jurnal.infaq === 'ya') skorInfaq += 1;
         });
         
         const totalScoreEl = document.getElementById('totalScore');
@@ -226,12 +314,7 @@ async function loadDashboardData() {
         
     } catch (error) {
         console.error('Error loading dashboard:', error);
-        
-        if (error.code === 'permission-denied') {
-            showAlert('Permission denied! Atur security rules Firestore terlebih dahulu.', 'error');
-        } else {
-            showAlert('Gagal memuat dashboard: ' + error.message, 'error');
-        }
+        showAlert('Gagal memuat dashboard: ' + error.message, 'error');
     }
 }
 
@@ -285,7 +368,7 @@ function initCharts(data) {
     if (ctx2) {
         const total = data.puasa + data.sholatWajib + data.tarawih + data.tadarus + data.jumat + data.infaq;
         const hadir = total;
-        const tidakHadir = Math.max(0, total * 2 - total); // Simple calculation
+        const tidakHadir = Math.max(0, total * 2 - total);
         
         charts.kehadiran = new Chart(ctx2, {
             type: 'doughnut',
@@ -318,15 +401,13 @@ async function loadUsers() {
         const searchTerm = document.getElementById('searchUser')?.value.toLowerCase() || '';
         const kelasFilter = document.getElementById('filterKelas')?.value || '';
         
-        const snapshot = await usersCollection.get();
         const tbody = document.getElementById('usersTableBody');
-        
         if (!tbody) {
             console.error('usersTableBody not found');
             return;
         }
         
-        if (snapshot.empty) {
+        if (appData.users.length === 0) {
             tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Belum ada data user. Silakan tambah user baru.</td></tr>';
             return;
         }
@@ -334,36 +415,23 @@ async function loadUsers() {
         let no = 1;
         let html = '';
         
-        for (const doc of snapshot.docs) {
-            const user = doc.data();
-            const userId = doc.id;
-            
-            // Filter by search term
-            if (searchTerm && !user.nama?.toLowerCase().includes(searchTerm)) {
-                continue;
-            }
-            
-            // Filter by kelas
-            if (kelasFilter && user.kelas !== kelasFilter) {
-                continue;
-            }
-            
+        // Filter users
+        let filteredUsers = appData.users.filter(user => {
+            if (searchTerm && !user.nama?.toLowerCase().includes(searchTerm)) return false;
+            if (kelasFilter && user.kelas !== kelasFilter) return false;
+            return true;
+        });
+        
+        for (const user of filteredUsers) {
             // Get user's jurnal count and total score
             let jurnalCount = 0;
             let totalSkor = 0;
             
-            try {
-                const jurnalSnapshot = await jurnalCollection
-                    .where('userId', '==', userId)
-                    .get();
-                
-                jurnalCount = jurnalSnapshot.size;
-                jurnalSnapshot.forEach(j => {
-                    totalSkor += j.data().totalScore || 0;
-                });
-            } catch (error) {
-                console.error('Error loading jurnal for user:', error);
-            }
+            const userJurnals = appData.jurnals.filter(j => j.userId === user.id);
+            jurnalCount = userJurnals.length;
+            userJurnals.forEach(j => {
+                totalSkor += j.totalScore || 0;
+            });
             
             html += `
                 <tr>
@@ -375,10 +443,10 @@ async function loadUsers() {
                     <td>${jurnalCount}</td>
                     <td>${totalSkor}</td>
                     <td>
-                        <button class="btn-edit" onclick="editUser('${userId}')" title="Edit">
+                        <button class="btn-edit" onclick="editUser('${user.id}')" title="Edit">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn-delete" onclick="deleteUser('${userId}')" title="Hapus">
+                        <button class="btn-delete" onclick="deleteUser('${user.id}')" title="Hapus">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -395,14 +463,7 @@ async function loadUsers() {
         
     } catch (error) {
         console.error('Error loading users:', error);
-        
-        if (error.code === 'permission-denied') {
-            showAlert('Permission denied! Atur security rules Firestore terlebih dahulu.', 'error');
-            document.getElementById('usersTableBody').innerHTML = 
-                '<tr><td colspan="8" style="text-align: center; color: red;">Error: Permission denied. Hubungi administrator.</td></tr>';
-        } else {
-            showAlert('Gagal memuat data user: ' + error.message, 'error');
-        }
+        showAlert('Gagal memuat data user: ' + error.message, 'error');
     }
 }
 
@@ -433,14 +494,11 @@ window.editUser = async function(userId) {
     console.log('Editing user:', userId);
     
     try {
-        const userDoc = await usersCollection.doc(userId).get();
-        
-        if (!userDoc.exists) {
+        const user = appData.userMap[userId];
+        if (!user) {
             showAlert('User tidak ditemukan', 'error');
             return;
         }
-        
-        const user = userDoc.data();
         
         const modalTitle = document.getElementById('modalTitle');
         if (modalTitle) {
@@ -491,6 +549,9 @@ window.deleteUser = async function(userId) {
         await batch.commit();
         
         showAlert('User berhasil dihapus', 'success');
+        
+        // Reload data
+        await loadAllData(true);
         await loadUsers();
         await loadDashboardData();
         
@@ -528,11 +589,9 @@ if (userForm) {
                 showAlert('User berhasil diperbarui', 'success');
             } else {
                 // Check if user already exists
-                const existingUser = await usersCollection
-                    .where('nama', '==', nama)
-                    .get();
+                const existingUser = appData.users.find(u => u.nama === nama);
                 
-                if (!existingUser.empty) {
+                if (existingUser) {
                     showAlert('User dengan nama tersebut sudah ada', 'error');
                     return;
                 }
@@ -548,17 +607,15 @@ if (userForm) {
             }
             
             closeModal('userModal');
+            
+            // Reload data
+            await loadAllData(true);
             await loadUsers();
             await loadDashboardData();
             
         } catch (error) {
             console.error('Error saving user:', error);
-            
-            if (error.code === 'permission-denied') {
-                showAlert('Permission denied! Atur security rules Firestore terlebih dahulu.', 'error');
-            } else {
-                showAlert('Gagal menyimpan user: ' + error.message, 'error');
-            }
+            showAlert('Gagal menyimpan user: ' + error.message, 'error');
         }
     });
 }
@@ -701,11 +758,9 @@ if (uploadForm) {
                     for (const user of users) {
                         try {
                             // Check if user already exists
-                            const existingUser = await usersCollection
-                                .where('nama', '==', user.nama)
-                                .get();
+                            const existingUser = appData.users.find(u => u.nama === user.nama);
                             
-                            if (existingUser.empty) {
+                            if (!existingUser) {
                                 await usersCollection.add(user);
                                 successCount++;
                             } else {
@@ -723,17 +778,15 @@ if (uploadForm) {
                     }
                     
                     closeModal('uploadModal');
+                    
+                    // Reload data
+                    await loadAllData(true);
                     await loadUsers();
                     await loadDashboardData();
                     
                 } catch (error) {
                     console.error('Error processing Excel:', error);
-                    
-                    if (error.code === 'permission-denied') {
-                        showAlert('Permission denied! Atur security rules Firestore terlebih dahulu.', 'error');
-                    } else {
-                        showAlert('Gagal memproses file Excel: ' + error.message, 'error');
-                    }
+                    showAlert('Gagal memproses file Excel: ' + error.message, 'error');
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -750,114 +803,108 @@ if (uploadForm) {
     });
 }
 
-// ===== DATA MANAGEMENT FUNCTIONS =====
-async function loadDataTable() {
-    try {
-        console.log('Loading data table...');
+// ===== VIEW MODE MANAGEMENT =====
+window.setViewMode = function(mode) {
+    currentViewMode = mode;
+    
+    const btnDetail = document.getElementById('modeDetail');
+    const btnKumulatif = document.getElementById('modeKumulatif');
+    const detailFilters = document.getElementById('detailFilters');
+    const kumulatifFilters = document.getElementById('kumulatifFilters');
+    const detailTable = document.getElementById('detailTableContainer');
+    const kumulatifTable = document.getElementById('kumulatifTableContainer');
+    
+    if (!btnDetail || !btnKumulatif) return;
+    
+    if (mode === 'detail') {
+        btnDetail.style.background = '#1e3c72';
+        btnDetail.style.color = 'white';
+        btnKumulatif.style.background = 'transparent';
+        btnKumulatif.style.color = '#666';
         
-        const sortBy = document.getElementById('sortData')?.value || 'tertinggi';
-        const kelasFilter = document.getElementById('filterKelasData')?.value || '';
-        const searchNama = document.getElementById('searchNama')?.value.toLowerCase() || '';
-        const tanggalFilter = document.getElementById('filterTanggal')?.value || '';
+        detailFilters.style.display = 'flex';
+        kumulatifFilters.style.display = 'none';
+        detailTable.style.display = 'block';
+        kumulatifTable.style.display = 'none';
         
-        let query = jurnalCollection;
+        applyDetailFilters();
+    } else {
+        btnKumulatif.style.background = '#1e3c72';
+        btnKumulatif.style.color = 'white';
+        btnDetail.style.background = 'transparent';
+        btnDetail.style.color = '#666';
         
-        if (tanggalFilter) {
-            query = query.where('tanggal', '==', tanggalFilter);
-        }
+        detailFilters.style.display = 'none';
+        kumulatifFilters.style.display = 'flex';
+        detailTable.style.display = 'none';
+        kumulatifTable.style.display = 'block';
         
-        const snapshot = await query.get();
-        
-        if (snapshot.empty) {
-            document.getElementById('dataTableBody').innerHTML = 
-                '<tr><td colspan="26" style="text-align: center;">Belum ada data jurnal</td></tr>';
-            return;
-        }
-        
-        const data = [];
-        
-        // Get user data for each jurnal
-        for (const doc of snapshot.docs) {
-            const jurnal = doc.data();
-            
-            // Get user info
-            const userDoc = await usersCollection.doc(jurnal.userId).get();
-            if (!userDoc.exists) continue;
-            
-            const user = userDoc.data();
-            
-            // Apply kelas filter
-            if (kelasFilter && user.kelas !== kelasFilter) {
-                continue;
-            }
-            
-            // Apply search filter
-            if (searchNama && !user.nama.toLowerCase().includes(searchNama)) {
-                continue;
-            }
-            
-            data.push({
-                id: doc.id,
-                ...jurnal,
-                userName: user.nama,
-                userKelas: user.kelas
-            });
-        }
-        
-        // Sort data
-        sortData(data, sortBy);
-        
-        // Display data
-        displayDataTable(data);
-        
-        console.log('Data table loaded:', data.length, 'records');
-        
-    } catch (error) {
-        console.error('Error loading data table:', error);
-        
-        if (error.code === 'permission-denied') {
-            showAlert('Permission denied! Atur security rules Firestore terlebih dahulu.', 'error');
-        } else {
-            showAlert('Gagal memuat data jurnal: ' + error.message, 'error');
-        }
+        applyKumulatifFilters();
     }
-}
+};
 
-function sortData(data, sortBy) {
-    switch(sortBy) {
-        case 'tertinggi':
-            data.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
-            break;
-        case 'terendah':
-            data.sort((a, b) => (a.totalScore || 0) - (b.totalScore || 0));
-            break;
-        case 'az':
-            data.sort((a, b) => (a.userName || '').localeCompare(b.userName || ''));
-            break;
-        case 'za':
-            data.sort((a, b) => (b.userName || '').localeCompare(a.userName || ''));
-            break;
+// ===== DETAIL JURNAL FUNCTIONS =====
+window.applyDetailFilters = function() {
+    const kelas = document.getElementById('filterKelasDetail')?.value || '';
+    const search = document.getElementById('searchNamaDetail')?.value.toLowerCase() || '';
+    const sortBy = document.getElementById('sortDetail')?.value || 'terbaru';
+    
+    // Gabungkan data jurnal dengan user info
+    let data = appData.jurnals.map(jurnal => {
+        const user = appData.userMap[jurnal.userId] || {};
+        return {
+            ...jurnal,
+            userName: user.nama || 'Unknown',
+            userKelas: user.kelas || '-'
+        };
+    }).filter(item => item.userName !== 'Unknown');
+    
+    // Filter by kelas
+    if (kelas) {
+        data = data.filter(item => item.userKelas === kelas);
     }
-}
+    
+    // Filter by nama
+    if (search) {
+        data = data.filter(item => item.userName.toLowerCase().includes(search));
+    }
+    
+    // Sorting
+    if (sortBy === 'terbaru') {
+        data.sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
+    } else if (sortBy === 'terlama') {
+        data.sort((a, b) => (a.tanggal || '').localeCompare(b.tanggal || ''));
+    } else if (sortBy === 'skorTertinggi') {
+        data.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+    } else if (sortBy === 'skorTerendah') {
+        data.sort((a, b) => (a.totalScore || 0) - (b.totalScore || 0));
+    } else if (sortBy === 'az') {
+        data.sort((a, b) => (a.userName || '').localeCompare(b.userName || ''));
+    } else if (sortBy === 'za') {
+        data.sort((a, b) => (b.userName || '').localeCompare(a.userName || ''));
+    }
+    
+    displayDetailTable(data);
+};
 
-function displayDataTable(data) {
+function displayDetailTable(data) {
     const tbody = document.getElementById('dataTableBody');
     if (!tbody) return;
     
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="26" style="text-align: center;">Tidak ada data jurnal</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="26" style="text-align: center; padding: 30px;">Tidak ada data jurnal</td></tr>';
         return;
     }
     
     let html = '';
     data.forEach((item, index) => {
-        html += createDataRow(item, index + 1);
+        html += createDetailRow(item, index + 1);
     });
     
     tbody.innerHTML = html;
 }
 
-function createDataRow(data, no) {
+function createDetailRow(data, no) {
     const shalat = data.shalat || {};
     
     return `
@@ -910,6 +957,167 @@ function getShalatScore(shalat) {
     return shalat.jamaah === 'berjamaah' ? 2 : 1;
 }
 
+// ===== KUMULATIF FUNCTIONS =====
+window.applyKumulatifFilters = function() {
+    const kelas = document.getElementById('filterKelasKumulatif')?.value || '';
+    const search = document.getElementById('searchNamaKumulatif')?.value.toLowerCase() || '';
+    const sortBy = document.getElementById('sortKumulatif')?.value || 'total-desc';
+    
+    // Hitung kumulatif untuk setiap user
+    let kumulatifData = appData.users.map(user => {
+        // Ambil semua jurnal user ini
+        const userJurnals = appData.jurnals.filter(j => j.userId === user.id);
+        
+        // Inisialisasi skor
+        let puasa = 0, sholat = 0, tarawih = 0, tadarus = 0, 
+            infaq = 0, jumat = 0, idulFitri = 0;
+        
+        // Hitung dari setiap jurnal
+        userJurnals.forEach(j => {
+            // Puasa
+            if (j.puasa?.status === 'ya') puasa += 1;
+            
+            // Sholat Wajib
+            if (j.shalat) {
+                Object.values(j.shalat).forEach(s => {
+                    if (s?.status === 'ya') {
+                        sholat += s.jamaah === 'berjamaah' ? 2 : 1;
+                    }
+                });
+            }
+            
+            // Ibadah lainnya
+            if (j.tarawih?.status === 'ya') tarawih += 1;
+            if (j.tadarus?.status === 'ya') tadarus += 1;
+            if (j.shalat_jumat?.status) jumat += 1;
+            if (j.infaq === 'ya') infaq += 1;
+            if (j.idul_fitri === 'ya') idulFitri += 1;
+        });
+        
+        const total = puasa + sholat + tarawih + tadarus + infaq + jumat + idulFitri;
+        const hari = userJurnals.length;
+        
+        return {
+            userId: user.id,
+            nama: user.nama,
+            kelas: user.kelas,
+            puasa, sholat, tarawih, tadarus, infaq, jumat, idulFitri,
+            total, hari,
+            rataPuasa: hari > 0 ? (puasa / hari).toFixed(1) : 0,
+            rataSholat: hari > 0 ? (sholat / hari).toFixed(1) : 0
+        };
+    });
+    
+    // Filter by kelas (TAMPILKAN SEMUA SISWA di kelas tersebut)
+    if (kelas) {
+        kumulatifData = kumulatifData.filter(item => item.kelas === kelas);
+    }
+    
+    // Filter by nama
+    if (search) {
+        kumulatifData = kumulatifData.filter(item => item.nama.toLowerCase().includes(search));
+    }
+    
+    // Sorting
+    if (sortBy === 'total-desc') {
+        kumulatifData.sort((a, b) => b.total - a.total);
+    } else if (sortBy === 'total-asc') {
+        kumulatifData.sort((a, b) => a.total - b.total);
+    } else if (sortBy === 'nama-asc') {
+        kumulatifData.sort((a, b) => a.nama.localeCompare(b.nama));
+    } else if (sortBy === 'nama-desc') {
+        kumulatifData.sort((a, b) => b.nama.localeCompare(a.nama));
+    }
+    
+    displayKumulatifTable(kumulatifData);
+};
+
+function displayKumulatifTable(data) {
+    const tbody = document.getElementById('kumulatifTableBody');
+    if (!tbody) return;
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="14" style="text-align: center; padding: 30px;">Tidak ada data siswa</td></tr>';
+        return;
+    }
+    
+    let html = '';
+    let totals = {
+        puasa: 0, sholat: 0, tarawih: 0, tadarus: 0,
+        infaq: 0, jumat: 0, idulFitri: 0, total: 0, hari: 0
+    };
+    
+    data.forEach((item, index) => {
+        // Tentukan class berdasarkan aktivitas
+        let rowClass = '';
+        if (item.hari === 0) {
+            rowClass = 'skor-empty';
+        } else if (item.total > 100) {
+            rowClass = 'skor-highlight';
+        }
+        
+        html += `
+            <tr class="${rowClass}">
+                <td>${index + 1}</td>
+                <td style="text-align: left;">${item.nama}</td>
+                <td>${item.kelas}</td>
+                <td><strong>${item.puasa}</strong></td>
+                <td>${item.rataPuasa}</td>
+                <td><strong>${item.sholat}</strong></td>
+                <td>${item.rataSholat}</td>
+                <td>${item.tarawih}</td>
+                <td>${item.tadarus}</td>
+                <td>${item.infaq}</td>
+                <td>${item.jumat}</td>
+                <td>${item.idulFitri}</td>
+                <td><strong style="color: #1e3c72; font-size: 1.1em;">${item.total}</strong></td>
+                <td>${item.hari}</td>
+            </tr>
+        `;
+        
+        // Update totals
+        totals.puasa += item.puasa;
+        totals.sholat += item.sholat;
+        totals.tarawih += item.tarawih;
+        totals.tadarus += item.tadarus;
+        totals.infaq += item.infaq;
+        totals.jumat += item.jumat;
+        totals.idulFitri += item.idulFitri;
+        totals.total += item.total;
+        totals.hari += item.hari;
+    });
+    
+    tbody.innerHTML = html;
+    
+    // Update footer
+    document.getElementById('totalPuasaAll').textContent = totals.puasa;
+    document.getElementById('totalSholatAll').textContent = totals.sholat;
+    document.getElementById('totalTarawihAll').textContent = totals.tarawih;
+    document.getElementById('totalTadarusAll').textContent = totals.tadarus;
+    document.getElementById('totalInfaqAll').textContent = totals.infaq;
+    document.getElementById('totalJumatAll').textContent = totals.jumat;
+    document.getElementById('totalIdulFitriAll').textContent = totals.idulFitri;
+    document.getElementById('totalKumulatifAll').textContent = totals.total;
+    document.getElementById('totalHariAll').textContent = totals.hari;
+}
+
+// ===== RESET FILTERS =====
+window.resetDetailFilters = function() {
+    document.getElementById('filterKelasDetail').value = '';
+    document.getElementById('searchNamaDetail').value = '';
+    document.getElementById('sortDetail').value = 'terbaru';
+    applyDetailFilters();
+    showAlert('Filter detail jurnal direset', 'success');
+};
+
+window.resetKumulatifFilters = function() {
+    document.getElementById('filterKelasKumulatif').value = '';
+    document.getElementById('searchNamaKumulatif').value = '';
+    document.getElementById('sortKumulatif').value = 'total-desc';
+    applyKumulatifFilters();
+    showAlert('Filter kumulatif direset', 'success');
+};
+
 // ===== EXPORT FUNCTIONS =====
 window.exportToExcel = async function() {
     const kelas = document.getElementById('exportKelas')?.value || '';
@@ -917,16 +1125,11 @@ window.exportToExcel = async function() {
     try {
         showAlert('Menyiapkan data untuk export...', 'info');
         
-        const snapshot = await jurnalCollection.get();
         const data = [];
         
-        for (const doc of snapshot.docs) {
-            const jurnal = doc.data();
-            const userDoc = await usersCollection.doc(jurnal.userId).get();
-            
-            if (!userDoc.exists) continue;
-            
-            const user = userDoc.data();
+        for (const jurnal of appData.jurnals) {
+            const user = appData.userMap[jurnal.userId];
+            if (!user) continue;
             
             if (kelas && user.kelas !== kelas) continue;
             
@@ -988,20 +1191,86 @@ window.exportToExcel = async function() {
     }
 };
 
+window.exportKumulatifToExcel = async function() {
+    try {
+        const kelasFilter = document.getElementById('filterKelasKumulatif')?.value || '';
+        
+        showAlert('Menyiapkan data export...', 'info');
+        
+        const exportData = [];
+        
+        for (const user of appData.users) {
+            if (kelasFilter && user.kelas !== kelasFilter) continue;
+            
+            const userJurnals = appData.jurnals.filter(j => j.userId === user.id);
+            
+            let puasa = 0, sholat = 0, tarawih = 0, tadarus = 0, 
+                infaq = 0, jumat = 0, idulFitri = 0;
+            
+            userJurnals.forEach(j => {
+                if (j.puasa?.status === 'ya') puasa++;
+                if (j.shalat) {
+                    Object.values(j.shalat).forEach(s => {
+                        if (s?.status === 'ya') {
+                            sholat += s.jamaah === 'berjamaah' ? 2 : 1;
+                        }
+                    });
+                }
+                if (j.tarawih?.status === 'ya') tarawih++;
+                if (j.tadarus?.status === 'ya') tadarus++;
+                if (j.shalat_jumat?.status) jumat++;
+                if (j.infaq === 'ya') infaq++;
+                if (j.idul_fitri === 'ya') idulFitri++;
+            });
+            
+            const total = puasa + sholat + tarawih + tadarus + infaq + jumat + idulFitri;
+            
+            exportData.push({
+                'Nama': user.nama,
+                'Kelas': user.kelas,
+                'Skor Puasa': puasa,
+                'Rata-rata Puasa': userJurnals.length > 0 ? (puasa / userJurnals.length).toFixed(1) : 0,
+                'Skor Sholat Wajib': sholat,
+                'Rata-rata Sholat': userJurnals.length > 0 ? (sholat / userJurnals.length).toFixed(1) : 0,
+                'Skor Tarawih': tarawih,
+                'Skor Tadarus': tadarus,
+                'Skor Infaq': infaq,
+                'Skor Jumat': jumat,
+                'Skor Idul Fitri': idulFitri,
+                'Total Kumulatif': total,
+                'Jumlah Hari Mengisi': userJurnals.length
+            });
+        }
+        
+        if (exportData.length === 0) {
+            showAlert('Tidak ada data untuk diexport', 'warning');
+            return;
+        }
+        
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Rekap Kumulatif");
+        
+        const fileName = `rekap_kumulatif_ramadhan_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+        
+        showAlert(`Berhasil mengexport ${exportData.length} data siswa`, 'success');
+        
+    } catch (error) {
+        console.error('Error exporting:', error);
+        showAlert('Gagal export data: ' + error.message, 'error');
+    }
+};
+
 window.exportUsersJSON = async function() {
     try {
-        const snapshot = await usersCollection.get();
-        const users = [];
-        
-        snapshot.forEach(doc => {
-            users.push({
-                id: doc.id,
-                nama: doc.data().nama,
-                kelas: doc.data().kelas,
-                createdAt: doc.data().createdAt,
-                lastLogin: doc.data().lastLogin
-            });
-        });
+        const users = appData.users.map(u => ({
+            id: u.id,
+            nama: u.nama,
+            kelas: u.kelas,
+            createdAt: u.createdAt,
+            lastLogin: u.lastLogin
+        }));
         
         const jsonStr = JSON.stringify(users, null, 2);
         const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -1023,21 +1292,15 @@ window.exportUsersJSON = async function() {
 
 window.exportAllJurnalJSON = async function() {
     try {
-        const snapshot = await jurnalCollection.get();
-        const jurnals = [];
-        
-        for (const doc of snapshot.docs) {
-            const data = doc.data();
-            const userDoc = await usersCollection.doc(data.userId).get();
-            const user = userDoc.data();
-            
-            jurnals.push({
-                id: doc.id,
-                ...data,
+        const jurnals = appData.jurnals.map(j => {
+            const user = appData.userMap[j.userId];
+            return {
+                id: j.id,
+                ...j,
                 userName: user?.nama,
                 userKelas: user?.kelas
-            });
-        }
+            };
+        });
         
         const jsonStr = JSON.stringify(jurnals, null, 2);
         const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -1066,6 +1329,10 @@ window.closeModal = function(modalId) {
 function showAlert(message, type) {
     console.log('Alert:', message, type);
     
+    // Hapus alert sebelumnya
+    const oldAlerts = document.querySelectorAll('.alert');
+    oldAlerts.forEach(a => a.remove());
+    
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type}`;
     
@@ -1085,7 +1352,7 @@ function showAlert(message, type) {
         
         setTimeout(() => {
             alertDiv.remove();
-        }, 5000);
+        }, 3000);
     }
 }
 
@@ -1142,4 +1409,17 @@ window.onclick = function(event) {
     if (event.target.classList.contains('modal')) {
         event.target.style.display = 'none';
     }
+};
+
+// Refresh data function
+window.refreshData = async function() {
+    await loadAllData(true);
+    if (currentViewMode === 'detail') {
+        applyDetailFilters();
+    } else {
+        applyKumulatifFilters();
+    }
+    await loadDashboardData();
+    await loadUsers();
+    showAlert('Data berhasil direfresh', 'success');
 };
