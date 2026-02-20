@@ -1460,3 +1460,66 @@ select.form-control {
         background: #3d3d3d;
     }
 }
+/* Tambahkan di admin.css */
+.kumulatif-section {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-top: 30px;
+}
+
+.kumulatif-section h4 {
+    color: #1e3c72;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.kumulatif-section h4 i {
+    color: #ffd700;
+}
+
+.kumulatif-section .table {
+    border: 1px solid #dee2e6;
+}
+
+.kumulatif-section .table th {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 13px;
+    padding: 10px 5px;
+}
+
+.kumulatif-section .table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.kumulatif-section .table tfoot td {
+    background: #e9ecef;
+    font-weight: 600;
+}
+
+.skor-highlight {
+    background: #fff3cd;
+    font-weight: bold;
+}
+
+.skor-low {
+    background: #f8d7da;
+}
+
+.skor-empty {
+    background: #f8f9fa;
+    color: #999;
+    font-style: italic;
+}
+
+.export-btn-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
